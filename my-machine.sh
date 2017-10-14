@@ -1,26 +1,52 @@
 #!/bin/bash
 
-# Usage: VBOX=<path_to_vbox_bin> my-machine <arch_iso>
+print_usage() {
+	echo ""
+	echo "USAGE: VBOX=<path_to_vbox_bin> ./my-machine <arch_iso> <vboxadd_iso>"
+}
+
+if [ -z "$VBOX" ]; then
+	echo "Path to the bin files of Virtual Box was not set."
+	print_usage
+	exit 1
+fi
+
+# Add VBox folder with bin files to path.
+PATH="$PATH:$VBOX"
+
+function exit_if_file_doesnt_exist() {
+	file=$1
+	if [ ! -f "$file" ]; then
+		echo "File $file not found. Exiting."
+		print_usage
+		exit 1
+	fi
+}
 
 ARCH_ISO_PATH=$1
-if [ -z $ARCH_ISO_PATH ]; then
+if [ -z "$ARCH_ISO_PATH" ]; then
 	echo "Arch .iso file path not specified."
+	print_usage
 	exit 1
 fi
 
-if [ -z $VBOX ]; then
-	echo "Path to the bin files of Virtual Box was not set."
-	exit 1
+VBOXADD_ISO_PATH=$2
+if [ -z "$VBOXADD_ISO_PATH" ]; then
+	echo "VirtualBox Guest Additions .iso file path not specified."
+	VBOXADD_ISO_PATH="C:\\Program Files\\Oracle\\VirtualBox\\VBoxGuestAdditions.iso"
+	echo "Using path: $VBOXADD_ISO_PATH"
 fi
 
-PATH="$PATH:$VBOX"
+exit_if_file_doesnt_exist "$ARCH_ISO_PATH"
+exit_if_file_doesnt_exist "$VBOXADD_ISO_PATH"
 
 function exit_if_exists() {
 	name=$1
 	type=$2
-	res=$(VBoxManage list $type | grep $name) 
-	if [ ! -z $res ]; then
+	res=$(VBoxManage list "$type" | grep "$name") 
+	if [ ! -z "$res" ]; then
 		echo "$type '$name' already exists. Remove/Rename it before proceeding."
+		print_usage
 		exit 1
 	fi
 }
@@ -38,33 +64,29 @@ RAM=4096 # 4GB
 VRAM=128 
 
 # Create dynamic disk
-VBoxManage createhd --filename $DISK_NAME --size $DISK_SIZE 
 VBoxManage createvm --name $VM_NAME --ostype $OS_TYPE --register
+VBoxManage createhd --filename $DISK_NAME --size $DISK_SIZE 
 
 # SATA controller with the dynamic disk attached
-VBoxManage storagectl $VM_NAME --name "SATA Controller" --add sata -- controller IntelAHCI
-VBoxManage storageattach $VM_NAME --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium $DISK_NAME
+SATA_CONTROLLER="SATA_Controller"
+VBoxManage storagectl $VM_NAME --name $SATA_CONTROLLER --add sata --controller IntelAHCI
+VBoxManage storageattach $VM_NAME --storagectl $SATA_CONTROLLER --port 0 --device 0 --type hdd --medium $DISK_NAME
 
-# IDE controller to attach the install ISO.
-VBoxManage storagectl $VM_NAME --name "IDE Controller" --add ide
-VBoxManage storageattach $VM_NAME --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium $ARCH_ISO_PATH
+# IDE controller to attach the Arch ISO and VBox Additions ISO.
+IDE_CONTROLLER="IDE_Controller"
+VBoxManage storagectl $VM_NAME --name $IDE_CONTROLLER --add ide
+VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
+VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
-VBoxManage modifyvm $VM_NAME --ioapic on
-# First boot has to be via DVD, later it should be changed to hdd: TODO.
+## First boot has to be via DVD, later it should be changed to hdd: TODO.
 VBoxManage modifyvm $VM_NAME --boot1 dvd --boot2 disk --boot3 none --boot4 none
 VBoxManage modifyvm $VM_NAME --memory $RAM --vram $VRAM 
-VBoxManage modifyvm $VM_NAME --natnet default
 
-VBoxHeadless -s $VM_NAME
+VBoxManage startvm $VM_NAME 
 
-# TODO: configure the OS
-
-#eject the DVD
-#VBoxManage storageattach $VM_NAME --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium none
-
-FIRST_SNAPSHOT_NAME="my-machine-setup"
+#FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.
-VBoxManage snapshot $VM_NAME take $FIRST_SNAPSHOT_NAME
+#VBoxManage snapshot $VM_NAME take $FIRST_SNAPSHOT_NAME
 
 # To get back to a snapshot
 #VBoxManage snapshot $VM_NAME restore $FIRST_SNAPSHOT_NAME
