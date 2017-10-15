@@ -82,6 +82,4 @@ def main(arg):
     print(' '.join(map(swap, arg.upper())))
 
 if __name__=='__main__':
-    sys.argv = sys.argv[1:]
-    print(sys.argv)
-    main(" ".join(sys.argv))
+    main(" ".join(sys.argv[1:]))
