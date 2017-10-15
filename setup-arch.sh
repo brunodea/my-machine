@@ -1,7 +1,7 @@
 #!/bin/bash
 
-$ROOT_PWD=$1
-if [ -z $ROOT_PWD ]; then
+ROOT_PWD="$1"
+if [ -z "$ROOT_PWD" ]; then
 	echo "Aborting. Missing root password."
 	exit 1
 fi
@@ -15,22 +15,24 @@ echo "Figuring out disk name..."
 DISK=$(fdisk -l | grep /dev/sd | awk '{print $2}' | sed 's/\/dev\///' | sed 's/://')
 
 # create partitions 
-alias PARTED_CMD="parted -a optimal -s /dev/${DISK}"
+function partedcmd() {
+	parted -a optimal -s /dev/${DISK} ${@:1}
+}
 
 echo "Making partion label MBR..."
-PARTED_CMD mklabel msdos
+partedcmd mklabel msdos
 echo "Making partition for Boot..."
-PARTED_CMD mkpart primary ext4 1MiB 100MiB
-PARTED_CMD set 1 boot on
+partedcmd mkpart primary ext4 1MiB 100MiB
+partedcmd set 1 boot on
 # /
 echo "Making partition for Root..."
-PARTED_CMD mkpart primary ext4 100MiB 65%
+partedcmd mkpart primary ext4 100MiB 65%
 # /swap
 echo "Making partigion for Swap..."
-PARTED_CMD mkpart primary linux-swap 65% 67%
+partedcmd mkpart primary linux-swap 65% 67%
 # /home
 echo "Making partition for Home..."
-PARTED_CMD mkpart primary ext4 67% 100%
+partedcmd mkpart primary ext4 67% 100%
 
 # The disk names are determined by the order they were created above.
 BOOT_DISK="${DISK}"1
