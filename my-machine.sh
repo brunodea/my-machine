@@ -105,13 +105,13 @@ sleep 30
 function send_keys_to_vm() {
 	for c in $(python $DIR/echo_scancode.py $1); do
 		VBoxManage controlvm $VM_NAME keyboardputscancode $c
-		sleep 0.1
+		sleep 0.01
 	done
 }
 
 echo "Making VM download the setup-arch.sh script."
 # ! is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh !"
+send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh && chmod +x setup-arch.sh && ./setup-arch.sh !"
 
 #FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.
