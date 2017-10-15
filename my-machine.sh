@@ -84,10 +84,8 @@ VBoxManage storageattach $VM_NAME --storagectl $SATA_CONTROLLER --port 0 --devic
 IDE_CONTROLLER="IDE_Controller"
 VBoxManage storagectl $VM_NAME --name $IDE_CONTROLLER --add ide
 VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
-VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
-## First boot has to be via DVD, later it should be changed to hdd: TODO.
-VBoxManage modifyvm $VM_NAME --boot1 dvd --boot2 disk --boot3 none --boot4 none
+VBoxManage modifyvm $VM_NAME --boot1 dvd --boot2 disk
 VBoxManage modifyvm $VM_NAME --memory $RAM --vram $VRAM 
 
 VBoxManage startvm $VM_NAME
@@ -100,6 +98,9 @@ VBoxManage controlvm $VM_NAME keyboardputscancode 1c 9c
 
 echo "Waiting 30s for VM to finish booting..."
 sleep 30
+
+# remove the Arch ISO so that the VM will use the disk when booting.
+#VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {

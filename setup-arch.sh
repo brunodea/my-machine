@@ -70,12 +70,12 @@ mount /dev/$HOME_DISK /mnt/home
 ##################################################################
 # make the Brazilian server the first of the list in mirrorlist. #
 ##################################################################
-echo "Setting brazilian server as the first in the mirrorlist..."
-grep 'archlinux-br\.mirror' -B 1 /etc/pacman.d/mirrorlist > tmp1
-grep -v 'archlinux-br\.mirror' /etc/pacman.d/mirrorlist > tmp2
-cat tmp2 >> tmp1
-mv tmp1 /etc/pacman.d/mirrorlist
-rm tmp2
+#echo "Setting brazilian server as the first in the mirrorlist..."
+#grep 'archlinux-br\.mirror' -B 1 /etc/pacman.d/mirrorlist > tmp1
+#grep -v 'archlinux-br\.mirror' /etc/pacman.d/mirrorlist > tmp2
+#cat tmp2 >> tmp1
+#mv tmp1 /etc/pacman.d/mirrorlist
+#rm tmp2
 ################################################################
 
 echo "Installing the base package..."
