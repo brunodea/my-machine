@@ -4,6 +4,7 @@ import sys
 # that is, the press and release scancode for each character.
 # Currently it only works with simple texts, with characters listed in the SCANCODES variable.
 
+# from http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
 # the char "!" is used as ENTER.
 SCANCODES = {
     "1": 0x02,
@@ -56,27 +57,57 @@ SCANCODES = {
     ".": 0x34,
     "/": 0x35,
     " ": 0x39,
+
+    #shift chars
+    "&": 0x08,
+    "+": 0x0d,
+
+    #special chars
+    "LShift": 0x2a,
 }
 
 # format do print the hex in.
 FORMAT='{:02x}'
 
-def swap(letter):
+def requires_shift(char):
+    return char in ["&", "+"]
+
+def press_code(char_code):
+    return FORMAT.format(char_code)
+def release_code(char_code):
+    return FORMAT.format(char_code|0b10000000)
+def press_release_codes(char_code):
+    return press_code(char_code) + ' ' + release_code(char_code)
+
+def surround_code(char_code, surround_code):
+    """
+    Description:
+        Takes a char code and surround it with some other code. For example, for getting the
+        code of '&', the char code for pressing and releasing the & key would have to be surrounded
+        by the shift press and release code.
+    Parameters:
+        char_code: code to be surrounded by
+        surround_code: code to surround
+    """
+    return '%s %s %s' % (press_code(surround_code), press_release_codes(char_code), release_code(surround_code))
+
+def swap(char):
     """
     Description:
         This function takes a single character and returns a string with its
         scancode information of press and release. If the char is missing from the list,
         return the char surrounded by square brackets.
     Parameters:
-        letter: a single character
+        char: a single character
     """
-    if letter in SCANCODES:
-        code = SCANCODES[letter]
-        # press code + release code
-        res = FORMAT.format(code) + ' ' + FORMAT.format(code|0b10000000)
-        return res
-    else:
-        return '['+letter+']'
+    res = '['+char+']'
+    if char in SCANCODES:
+        code = SCANCODES[char]
+        if requires_shift(char):
+            res = surround_code(code, SCANCODES["LShift"])
+        else:
+            res = press_release_codes(code)
+    return res
 
 def main(arg):
     print(' '.join(map(swap, arg.upper())))
