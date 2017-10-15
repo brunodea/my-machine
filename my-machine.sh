@@ -110,8 +110,9 @@ function send_keys_to_vm() {
 }
 
 echo "Making VM download the setup-arch.sh script."
+github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
 # ! is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh && chmod +x setup-arch.sh && ./setup-arch.sh ${ROOT_PWD} !"
+send_keys_to_vm "wget ${github_raw}/setup-arch.sh && wget ${github_raw}/setup-arch-step2.sh && chmod +x setup-arch.sh && ./setup-arch.sh ${ROOT_PWD} !"
 
 #FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.

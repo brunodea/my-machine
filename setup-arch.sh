@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# if anything fails, abort!
+set -e
+
 ROOT_PWD="$1"
 if [ -z "$ROOT_PWD" ]; then
 	echo "Aborting. Missing root password."
@@ -79,34 +82,18 @@ echo "Installing the base package..."
 yes | pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# in order to run the step2 of the script, we have to call it from the .bashrc
+# file of the root user of our machine, everything after the change root line in the
+# current script will only be performed after leaving the new root.
+
+# move the step2 script to the /root folder and run it.
+# after everything is done, remove the script file and the .bashrc file.
+mv setup-arch-step2.sh /mnt/root
+echo "#!/bin/bash" > /mnt/root/.bashrc
+echo "chmod +x setup-arch-step2.sh" > /mnt/root/.bashrc
+echo "./setup-arch-step2.sh ${ROOT_PWD}" > /mnt/root/.bashrc
+echo "rm /root/setup-arch-step2.sh" > /mnt/root/.bashrc
+echo "rm /root/.bashrc" > /mnt/root/.bashrc
+
 echo "chrooting to /mnt..."
 arch-chroot /mnt
-
-echo "Setting the local time and language..."
-ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-hwclock --systohc
-
-sed 's/#en_US\.UTF-8/en_US\.UTF-8/g' -i /etc/locale.gen
-locale-gen
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "myarch" > /etc/hostname
-echo "127.0.1.1	myarch.localdoman	myarch" >> /etc/hosts
-
-# TODO: install wireless network stuff?
-
-echo "Installing expect program..."
-yes | pacman -S expect
-echo "Setting root password..."
-/usr/bin/expect <<EOD
-spawn passwd
-expect "New password:"
-send "${ROOT_PWD}\n"
-expect "Retype new password:"
-send "${ROOT_PWD}\n"
-EOD
-echo ""
-
-echo "Installing GRUB..."
-yes | pacman -S grub
-#TODO: add boot partition name
-grub-install --target=i386-pc /dev/$BOOT_DISK
