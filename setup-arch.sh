@@ -92,8 +92,8 @@ cp setup-arch-step2.sh /mnt/root
 echo "#!/bin/bash" > /mnt/root/.bashrc
 echo "chmod +x setup-arch-step2.sh" >> /mnt/root/.bashrc
 echo "./setup-arch-step2.sh ${BOOT_DISK} ${ROOT_PWD} 2>&1 | tee /mnt/root/step2.out" >> /mnt/root/.bashrc
-echo "rm /root/setup-arch-step2.sh" >> /mnt/root/.bashrc
-echo "rm /root/.bashrc" >> /mnt/root/.bashrc
+#echo "rm /root/setup-arch-step2.sh" >> /mnt/root/.bashrc
+#echo "rm /root/.bashrc" >> /mnt/root/.bashrc
 
 echo "chrooting to /mnt..."
 arch-chroot /mnt
