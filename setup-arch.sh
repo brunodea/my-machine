@@ -23,10 +23,11 @@ ROOT_DISK="${DISK}"2
 SWAP_DISK="${DISK}"3
 HOME_DISK="${DISK}"4
 
-# parted already formats them.
-#mkfs.fat -F32 /dev/$BOOT_DISK
-#mkfs.ext4 /dev/$ROOT_DISK
-#mkfs.ext4 /dev/$HOME_DISK
+# format partitions
+mkfs.fat -F32 /dev/$BOOT_DISK
+mkfs.ext4 /dev/$ROOT_DISK
+mkswap /dev/$SWAP_DISK
+mkfs.ext4 /dev/$HOME_DISK
 
 ###################################
 # mount the filesystem structure. #
