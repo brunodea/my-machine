@@ -1,8 +1,10 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 print_usage() {
 	echo ""
-	echo "USAGE: VBOX=<path_to_vbox_bin> ./my-machine <arch_iso> <vboxadd_iso>"
+	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ./my-machine <arch_iso> <vboxadd_iso>"
 }
 
 if [ -z "$VBOX" ]; then
@@ -11,8 +13,14 @@ if [ -z "$VBOX" ]; then
 	exit 1
 fi
 
+if [ -z "$PYTHON" ]; then
+	echo "Path to Python was not set."
+	print_usage
+	exit 1
+fi
+
 # Add VBox folder with bin files to path.
-PATH="$PATH:$VBOX"
+PATH="$PATH:$VBOX:$PYTHON"
 
 function exit_if_file_doesnt_exist() {
 	file=$1
@@ -82,7 +90,28 @@ VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device
 VBoxManage modifyvm $VM_NAME --boot1 dvd --boot2 disk --boot3 none --boot4 none
 VBoxManage modifyvm $VM_NAME --memory $RAM --vram $VRAM 
 
-VBoxManage startvm $VM_NAME 
+VBoxManage startvm $VM_NAME
+
+echo "Waiting 5 seconds..."
+sleep 5
+echo "Sending 'ENTER' key to $VM_NAME."
+# 1c: pressing ENTER key; 9c: releasing ENTER key.
+VBoxManage controlvm $VM_NAME keyboardputscancode 1c 9c
+
+echo "Waiting 30s for VM to finish booting..."
+sleep 30
+
+# Send keyboard keys to VM.
+function send_keys_to_vm() {
+	for c in $(python $DIR/echo_scancode.py $1); do
+		VBoxManage controlvm $VM_NAME keyboardputscancode $c
+		sleep 0.1
+	done
+}
+
+echo "Making VM download the setup-arch.sh script."
+# ! is interpreted as ENTER by the echo_scancode.py script.
+send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh !"
 
 #FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.
