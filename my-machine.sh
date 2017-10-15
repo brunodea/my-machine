@@ -104,8 +104,8 @@ sleep 30
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
-	for c in $(python $DIR/echo_scancode.py $1); do
-		VBoxManage controlvm $VM_NAME keyboardputscancode $c
+	for c in $(python $DIR/echo_scancode.py "$1"); do
+		VBoxManage controlvm "$VM_NAME" keyboardputscancode $c
 		sleep 0.01
 	done
 }
