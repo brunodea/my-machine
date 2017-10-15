@@ -3,6 +3,9 @@
 #if anything fails, abort!
 set -e
 
+BOOT_DISK=$1
+ROOT_PWD=$2
+
 echo "Setting the local time and language..."
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc

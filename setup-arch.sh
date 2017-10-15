@@ -88,12 +88,12 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # move the step2 script to the /root folder and run it.
 # after everything is done, remove the script file and the .bashrc file.
-mv setup-arch-step2.sh /mnt/root
+cp setup-arch-step2.sh /mnt/root
 echo "#!/bin/bash" > /mnt/root/.bashrc
-echo "chmod +x setup-arch-step2.sh" > /mnt/root/.bashrc
-echo "./setup-arch-step2.sh ${ROOT_PWD} 2>&1 | tee /mnt/root/step2.out" > /mnt/root/.bashrc
-echo "rm /root/setup-arch-step2.sh" > /mnt/root/.bashrc
-echo "rm /root/.bashrc" > /mnt/root/.bashrc
+echo "chmod +x setup-arch-step2.sh" >> /mnt/root/.bashrc
+echo "./setup-arch-step2.sh ${BOOT_DISK} ${ROOT_PWD} 2>&1 | tee /mnt/root/step2.out" >> /mnt/root/.bashrc
+echo "rm /root/setup-arch-step2.sh" >> /mnt/root/.bashrc
+echo "rm /root/.bashrc" >> /mnt/root/.bashrc
 
 echo "chrooting to /mnt..."
 arch-chroot /mnt
