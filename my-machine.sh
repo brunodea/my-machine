@@ -4,20 +4,20 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 print_usage() {
 	echo ""
-	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ./my-machine <arch_iso> <vboxadd_iso>"
+	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> ./my-machine <arch_iso> <vboxadd_iso>"
 }
 
-if [ -z "$VBOX" ]; then
-	echo "Path to the bin files of Virtual Box was not set."
-	print_usage
-	exit 1
-fi
+function verify_var_set() {
+	if [ -z "$1" ]; then
+		echo "Variable $2 was not set."
+		print_usage
+		exit 1
+	fi
+}
 
-if [ -z "$PYTHON" ]; then
-	echo "Path to Python was not set."
-	print_usage
-	exit 1
-fi
+verify_var_set "$VBOX" "VBOX"
+verify_var_set "$PYTHON" "PYTHON"
+verify_var_set "$ROOT_PWD" "ROOT_PWD"
 
 # Add VBox folder with bin files to path.
 PATH="$PATH:$VBOX:$PYTHON"
@@ -111,7 +111,7 @@ function send_keys_to_vm() {
 
 echo "Making VM download the setup-arch.sh script."
 # ! is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh && chmod +x setup-arch.sh && ./setup-arch.sh !"
+send_keys_to_vm "wget raw.githubusercontent.com/brunodea/my-machine/master/setup-arch.sh && chmod +x setup-arch.sh && ./setup-arch.sh ${ROOT_PWD} !"
 
 #FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.
