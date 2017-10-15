@@ -62,6 +62,7 @@ SCANCODES = {
     "+": 0x0d,
     "<": 0x33,
     ">": 0x34,
+    "|": 0x2b,
 
     #special chars
     "LShift": 0x2a,
@@ -71,7 +72,7 @@ SCANCODES = {
 FORMAT='{:02x}'
 
 def requires_shift(char):
-    return char in ["&", "+", ">"]
+    return char in ["&", "+", ">", "|"]
 
 def press_code(char_code):
     return FORMAT.format(char_code)
