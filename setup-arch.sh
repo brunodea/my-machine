@@ -45,7 +45,7 @@ HOME_DISK="${DISK}"4
 
 # format partitions
 echo "Formatting Boot partition..."
-mkfs.fat -F32 /dev/$BOOT_DISK
+mkfs.ext4 /dev/$BOOT_DISK
 echo "Formatting Root partition..."
 mkfs.ext4 /dev/$ROOT_DISK
 echo "Formatting Swap partition..."
