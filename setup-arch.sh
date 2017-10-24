@@ -91,7 +91,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cp setup-arch-step2.sh /mnt/root
 echo "#!/bin/bash" > /mnt/root/.bashrc
 echo "chmod +x /root/setup-arch-step2.sh" >> /mnt/root/.bashrc
-echo "./root/setup-arch-step2.sh ${BOOT_DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out" >> /mnt/root/.bashrc
+echo "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out" >> /mnt/root/.bashrc
 echo "rm /root/setup-arch-step2.sh" >> /mnt/root/.bashrc
 echo "rm /root/.bashrc" >> /mnt/root/.bashrc
 
