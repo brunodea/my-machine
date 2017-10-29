@@ -101,14 +101,22 @@ echo "Host-only network IP: ${HONLY_IP}"
 VBoxManage modifyvm "$VM_NAME" --hostonlyadapter2 "$HONLY_NET"
 VBoxManage startvm "$VM_NAME"
 
-echo "Waiting 5 seconds..."
-sleep 5
+function count_down {
+	secs=$1
+	while [ $secs -gt 0 ]; do
+		echo -ne "Waiting... $secs\033[0K\r"
+		sleep 1
+		: $((secs--))
+	done
+}
+
+count_down 5
 echo "Sending 'ENTER' key to "$VM_NAME"."
 # 1c: pressing ENTER key; 9c: releasing ENTER key.
 VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
 
-echo "Waiting 40s for VM to finish booting..."
-sleep 40
+# Waiting VM to start
+count_down 60
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
@@ -119,6 +127,7 @@ function send_keys_to_vm() {
 }
 
 
+rm -rf ~/.ssh
 echo "Making VM setup SSH..."
 github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
 SSH_SCRIPT='setup-arch-ssh.sh'
