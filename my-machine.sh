@@ -62,7 +62,7 @@ function exit_if_exists() {
 VM_NAME='MyArch-64bits'
 DISK_NAME="${VM_NAME}.vid"
 
-exit_if_exists $VM_NAME 'vms'
+exit_if_exists "$VM_NAME" 'vms'
 exit_if_exists $DISK_NAME 'hdds'
 
 
@@ -72,55 +72,65 @@ RAM=4096 # 4GB
 VRAM=128 
 
 # Create dynamic disk
-VBoxManage createvm --name $VM_NAME --ostype $OS_TYPE --register
+VBoxManage createvm --name "$VM_NAME" --ostype $OS_TYPE --register
 VBoxManage createhd --filename $DISK_NAME --size $DISK_SIZE 
 
 # SATA controller with the dynamic disk attached
 SATA_CONTROLLER="SATA_Controller"
-VBoxManage storagectl $VM_NAME --name $SATA_CONTROLLER --add sata --controller IntelAHCI
-VBoxManage storageattach $VM_NAME --storagectl $SATA_CONTROLLER --port 0 --device 0 --type hdd --medium $DISK_NAME
+VBoxManage storagectl "$VM_NAME" --name $SATA_CONTROLLER --add sata --controller IntelAHCI
+VBoxManage storageattach "$VM_NAME" --storagectl $SATA_CONTROLLER --port 0 --device 0 --type hdd --medium $DISK_NAME
 
 # IDE controller to attach the Arch ISO and VBox Additions ISO.
 IDE_CONTROLLER="IDE_Controller"
-VBoxManage storagectl $VM_NAME --name $IDE_CONTROLLER --add ide
-VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
+VBoxManage storagectl "$VM_NAME" --name $IDE_CONTROLLER --add ide
+VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
+VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
-VBoxManage modifyvm $VM_NAME --boot1 dvd --boot2 disk
-VBoxManage modifyvm $VM_NAME --memory $RAM --vram $VRAM 
+VBoxManage modifyvm "$VM_NAME" --boot1 dvd --boot2 disk
+VBoxManage modifyvm "$VM_NAME" --memory $RAM --vram $VRAM 
 
-VBoxManage startvm $VM_NAME
+# host-only network in order to SSH.
+VBoxManage modifyvm "$VM_NAME" --nic2 hostonly
+# figure out the name of the hostonly interface
+HONLY_NET=$(VBoxManage hostonlyif create | grep -i interface | awk -F"'" '{print $2}')
+HONLY_IP="192.168.42.1"
+VM_IP="192.168.42.100"
+VBoxManage hostonlyif ipconfig "${HONLY_NET}" --ip "${HONLY_IP}" --netmask 255.255.255.0
+echo "Using host-only network: ${HONLY_NET}"
+echo "Host-only network IP: ${HONLY_IP}"
+VBoxManage modifyvm "$VM_NAME" --hostonlyadapter2 "$HONLY_NET"
+VBoxManage startvm "$VM_NAME"
 
 echo "Waiting 5 seconds..."
 sleep 5
-echo "Sending 'ENTER' key to $VM_NAME."
+echo "Sending 'ENTER' key to "$VM_NAME"."
 # 1c: pressing ENTER key; 9c: releasing ENTER key.
-VBoxManage controlvm $VM_NAME keyboardputscancode 1c 9c
+VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
 
-echo "Waiting 30s for VM to finish booting..."
-sleep 30
-
-# remove the Arch ISO so that the VM will use the disk when booting.
-#VBoxManage storageattach $VM_NAME --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$VBOXADD_ISO_PATH"
+echo "Waiting 40s for VM to finish booting..."
+sleep 40
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
 	for c in $(python $DIR/echo_scancode.py "$1"); do
-		VBoxManage controlvm "$VM_NAME" keyboardputscancode $c
+		VBoxManage controlvm ""$VM_NAME"" keyboardputscancode $c
 		sleep 0.01
 	done
 }
 
-echo "Making VM download the setup-arch.sh script."
+
+echo "Making VM setup SSH..."
 github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
-# ! is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget ${github_raw}/setup-arch.sh && wget ${github_raw}/setup-arch-step2.sh && chmod +x setup-arch.sh && ./setup-arch.sh ${ROOT_PWD} 2>&1 | tee /mnt/root/step1.out !"
+SSH_SCRIPT='setup-arch-ssh.sh'
+# '!' is interpreted as ENTER by the echo_scancode.py script.
+send_keys_to_vm "wget ${github_raw}/$SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP root !"
 
 #TODO: make this script wait on some box property that is going to be set after the VBox Guest Additions is installed in the VM.
 
 #FIRST_SNAPSHOT_NAME="my-machine-setup"
 # Snapshot after the setup is done.
-#VBoxManage snapshot $VM_NAME take $FIRST_SNAPSHOT_NAME
+#VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 # To get back to a snapshot
-#VBoxManage snapshot $VM_NAME restore $FIRST_SNAPSHOT_NAME
+#VBoxManage snapshot "$VM_NAME" restore $FIRST_SNAPSHOT_NAME
 
