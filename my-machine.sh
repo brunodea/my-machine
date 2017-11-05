@@ -91,32 +91,42 @@ VBoxManage modifyvm "$VM_NAME" --memory $RAM --vram $VRAM
 
 # host-only network in order to SSH.
 VBoxManage modifyvm "$VM_NAME" --nic2 hostonly
-# figure out the name of the hostonly interface
-HONLY_NET=$(VBoxManage hostonlyif create | grep -i interface | awk -F"'" '{print $2}')
+
 HONLY_IP="192.168.42.1"
 VM_IP="192.168.42.100"
+# verifies if hostonly interface with the provided ip already exists
+HONLY_NET=$(VBoxManage list hostonlyifs | grep $HONLY_IP -B 3 | grep Name | awk -F: '{print $2}' | xargs)
+if [ -z "${HONLY_NET}" ]; then
+	# case the interface doesn't exist, create a new one.
+	VBoxManage hostonlyif create
+	HONLY_NET=$(VBoxManage list hostonlyifs | grep $HONLY_IP -B 3 | grep Name | awk -F: '{print $2}' | xargs)
+fi
+
 VBoxManage hostonlyif ipconfig "${HONLY_NET}" --ip "${HONLY_IP}" --netmask 255.255.255.0
 echo "Using host-only network: ${HONLY_NET}"
 echo "Host-only network IP: ${HONLY_IP}"
+VBoxManage modifyvm "$VM_NAME" --nic2 hostonly
 VBoxManage modifyvm "$VM_NAME" --hostonlyadapter2 "$HONLY_NET"
 VBoxManage startvm "$VM_NAME"
 
 function count_down {
 	secs=$1
+	reason=$2
 	while [ $secs -gt 0 ]; do
-		echo -ne "Waiting... $secs\033[0K\r"
+		echo -ne "Waiting... $secs: ${reason}\033[0K\r"
 		sleep 1
 		: $((secs--))
 	done
+	echo ""
 }
 
-count_down 5
+count_down 5 "Skipping VBox start logo."
 echo "Sending 'ENTER' key to "$VM_NAME"."
 # 1c: pressing ENTER key; 9c: releasing ENTER key.
 VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
 
 # Waiting VM to start
-count_down 60
+count_down 50 "Waiting for VM to start."
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
@@ -131,8 +141,33 @@ rm -rf ~/.ssh
 echo "Making VM setup SSH..."
 github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
 SSH_SCRIPT='setup-arch-ssh.sh'
+ROOT_ARCHISO_PWD='root'
 # '!' is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget ${github_raw}/$SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP root !"
+send_keys_to_vm "wget ${github_raw}/$SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP $ROOT_ARCHISO_PWD!"
+
+count_down 10 "Waiting for VM to start the SSH service."
+# create keys without prompting for passphrases.
+if [ ! -f id_rsa ]; then
+	ssh-keygen -f id_rsa -t rsa -N '' -b 2048
+fi
+
+# ssh operations without asking to confirm the host identity key.
+root_addr="root@$VM_IP"
+alias ssh-copy-id="ssh-copy-id -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
+alias ssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
+alias sftp="sftp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
+ssh-copy-id
+sftp <<!
+cd /root
+put setup-arch-step1.sh
+put setup-arch-step2.sh
+put setup-arch-step3.sh
+!
+ssh <<!
+cd /root
+chmod +x setup-arch-step*
+./setup-arch-step2.sh
+!
 
 #TODO: make this script wait on some box property that is going to be set after the VBox Guest Additions is installed in the VM.
 
