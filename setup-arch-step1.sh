@@ -95,14 +95,11 @@ echo "Running STEP 2..."
 EXEC_CHROOT "chmod +x /root/setup-arch-step2.sh"
 EXEC_CHROOT "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out"
 if [ $? = 0 ]; then
-	vbox_add=$(ls /dev/disks/by-label/VBOXADDITIONS*)
 	# Make the root run STEP 3 in the very first boot.
 	echo "#!/bin/bash" >> /mnt/root/.bashrc
 	echo "chmod +x /root/setup-arch-step3.sh" >> /mnt/root/.bashrc
 	echo "./root/setup-arch-step3.sh" >> /mnt/root/.bashrc
 	echo "rm /root/.bashrc" >> /mnt/root/.bashrc
-
-	reboot
 else
 	echo "========== STEP 2: FAILED =========="
 fi

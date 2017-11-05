@@ -84,7 +84,7 @@ VBoxManage storageattach "$VM_NAME" --storagectl $SATA_CONTROLLER --port 0 --dev
 IDE_CONTROLLER="IDE_Controller"
 VBoxManage storagectl "$VM_NAME" --name $IDE_CONTROLLER --add ide
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
-VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
+#VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
 VBoxManage modifyvm "$VM_NAME" --boot1 dvd --boot2 disk
 VBoxManage modifyvm "$VM_NAME" --memory $RAM --vram $VRAM 
@@ -145,7 +145,7 @@ ROOT_ARCHISO_PWD='root'
 # '!' is interpreted as ENTER by the echo_scancode.py script.
 send_keys_to_vm "wget ${github_raw}/$SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP $ROOT_ARCHISO_PWD!"
 
-count_down 10 "Waiting for VM to start the SSH service."
+count_down 5 "Waiting for VM to start the SSH service."
 # create keys without prompting for passphrases.
 if [ ! -f id_rsa ]; then
 	ssh-keygen -f id_rsa -t rsa -N '' -b 2048
@@ -153,21 +153,25 @@ fi
 
 # ssh operations without asking to confirm the host identity key.
 root_addr="root@$VM_IP"
-alias ssh-copy-id="ssh-copy-id -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
-alias ssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
-alias sftp="sftp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa.pub $root_addr"
-ssh-copy-id
-sftp <<!
+ssh-copy-id -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr
+sftp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr <<!
 cd /root
-put setup-arch-step1.sh
-put setup-arch-step2.sh
-put setup-arch-step3.sh
+put $DIR/setup-arch-step1.sh
+put $DIR/setup-arch-step2.sh
+put $DIR/setup-arch-step3.sh
 !
-ssh <<!
+# remove \r line endings in the scripts so zsh can execute them.
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr <<!
 cd /root
+sed -i -e 's/\r$//' setup-arch-step*
 chmod +x setup-arch-step*
-./setup-arch-step1.sh
+./setup-arch-step1.sh $ROOT_PWD
 !
+VBoxManage controlvm "$VM_NAME" acpipowerbutton
+count_down 3 "Waiting VM to shutdown"
+# Remove ARCHISO from the VM so it boots from the HDD.
+VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
+VBoxManage startvm "$VM_NAME"
 
 #TODO: make this script wait on some box property that is going to be set after the VBox Guest Additions is installed in the VM.
 

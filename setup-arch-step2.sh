@@ -18,17 +18,8 @@ echo "127.0.1.1	myarch.localdoman	myarch" >> /etc/hosts
 
 # TODO: install wireless network stuff?
 
-echo "Installing expect program..."
-yes | pacman -S expect
 echo "Setting root password..."
-/usr/bin/expect <<EOD
-spawn passwd
-expect "New password:"
-send "${ROOT_PWD}\n"
-expect "Retype new password:"
-send "${ROOT_PWD}\n"
-EOD
-echo ""
+echo -e "${ROOT_PWD}\n${ROOT_PWD}" | passwd root
 
 echo "Installing GRUB..."
 yes | pacman -S grub
@@ -38,3 +29,4 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # for intel microcode updates
 yes | pacman -S intel-ucode
 grub-mkconfig -o /boot/grub/grub.cfg
+
