@@ -166,7 +166,7 @@ put setup-arch-step3.sh
 ssh <<!
 cd /root
 chmod +x setup-arch-step*
-./setup-arch-step2.sh
+./setup-arch-step1.sh
 !
 
 #TODO: make this script wait on some box property that is going to be set after the VBox Guest Additions is installed in the VM.
