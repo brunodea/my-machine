@@ -168,7 +168,7 @@ chmod +x setup-arch-step*
 ./setup-arch-step1.sh $ROOT_PWD
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
-count_down 3 "Waiting VM to shutdown"
+count_down 10 "Waiting VM to shutdown"
 # Remove ARCHISO from the VM so it boots from the HDD.
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
 VBoxManage startvm "$VM_NAME"

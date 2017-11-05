@@ -84,7 +84,6 @@ echo "Installing the base package..."
 yes | pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
-alias EXEC_CHROOT="arch-chroot /mnt /bin/bash -c"
 # move the step2 script to the /root folder and run it.
 # after everything is done, remove the script file and the .bashrc file.
 cp setup-arch-step2.sh /mnt/root
@@ -92,8 +91,8 @@ cp setup-arch-step3.sh /mnt/root
 
 echo "========== STEP 1: SUCCESS =========="
 echo "Running STEP 2..."
-EXEC_CHROOT "chmod +x /root/setup-arch-step2.sh"
-EXEC_CHROOT "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out"
+arch-chroot /mnt /bin/bash -c "chmod +x /root/setup-arch-step2.sh"
+arch-chroot /mnt /bin/bash -c "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out"
 if [ $? = 0 ]; then
 	# Make the root run STEP 3 in the very first boot.
 	echo "#!/bin/bash" >> /mnt/root/.bashrc
