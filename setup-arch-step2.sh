@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "========== STEP 2 START =========="
+
 #if anything fails, abort!
 set -e
 
@@ -32,3 +34,5 @@ pacman -S intel-ucode --noconfirm
 pacman -S networkmanager --noconfirm
 # fix grub
 grub-mkconfig -o /boot/grub/grub.cfg
+
+echo "========== STEP 2: SUCCESS =========="
