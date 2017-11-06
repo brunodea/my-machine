@@ -18,6 +18,8 @@ function verify_var_set() {
 verify_var_set "$VBOX" "VBOX"
 verify_var_set "$PYTHON" "PYTHON"
 verify_var_set "$ROOT_PWD" "ROOT_PWD"
+verify_var_set "$USER" "USER"
+verify_var_set "$USER_PWD" "USER_PWD"
 
 # Add VBox folder with bin files to path.
 PATH="$PATH:$VBOX:$PYTHON"
@@ -165,18 +167,18 @@ ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_
 cd /root
 sed -i -e 's/\r$//' setup-arch-step*
 chmod +x setup-arch-step*
-./setup-arch-step1.sh $ROOT_PWD
+./setup-arch-step1.sh $ROOT_PWD $USER "$USER_PWD"
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
 count_down 10 "Waiting VM to shutdown"
 # Remove ARCHISO from the VM so it boots from the HDD.
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
-VBoxManage startvm "$VM_NAME"
 
 FIRST_SNAPSHOT_NAME="empty-machine"
 # Snapshot after the setup is done.
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
-# To get back to a snapshot
-#VBoxManage snapshot "$VM_NAME" restore $FIRST_SNAPSHOT_NAME
+VBoxManage startvm "$VM_NAME"
+count_down 15 "Waiting for VM to start"
 
+send_keys_to_vm "root!$ROOT_PWD!"
