@@ -174,11 +174,18 @@ count_down 10 "Waiting VM to shutdown"
 # Remove ARCHISO from the VM so it boots from the HDD.
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
 
-FIRST_SNAPSHOT_NAME="empty-machine"
-# Snapshot after the setup is done.
+# create snapshot before running STEP 3.
+# this is useful in case we want to change STEP 3 without having to recreate everything from scratch.
+FIRST_SNAPSHOT_NAME="crude-machine"
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 VBoxManage startvm "$VM_NAME"
 count_down 15 "Waiting for VM to start"
 
-send_keys_to_vm "root!$ROOT_PWD!"
+# login to VM and make it run STEP 3.
+send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step3.sh $USER \"$USER_PWD\" !"
+
+# TODO: create a snapshot after STEP 3 is finished.
+# how to do it: step 3 install vboxadditions, which means we can wait some property to be set. So, here we can wait such property
+#SECOND_SNAPSHOT_NAME="initial-machine"
+#VBoxManage snapshot "$VM_NAME" take $SECOND_SNAPSHOT_NAME

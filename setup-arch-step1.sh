@@ -10,8 +10,6 @@ if [ -z "$ROOT_PWD" ]; then
 	echo "Aborting. Missing root password."
 	exit 1
 fi
-USER=$2
-USER_PWD=$3
 
 echo "Setting system clock..."
 # ensure the system clock is accurate
@@ -95,11 +93,7 @@ echo "========== STEP 1: SUCCESS =========="
 echo "Running STEP 2..."
 arch-chroot /mnt /bin/bash -c "chmod +x /root/setup-arch-step2.sh"
 arch-chroot /mnt /bin/bash -c "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out"
-if [ $? = 0 ]; then
-	# Make the root run STEP 3 in the very first boot.
-	echo "#!/bin/bash" >> /mnt/root/.bashrc
-	echo "./setup-arch-step3.sh $USER \"$USER_PWD\"" >> /mnt/root/.bashrc
-	echo "rm /root/.bashrc" >> /mnt/root/.bashrc
-else
+if [ ! $? = 0 ]; then
 	echo "========== STEP 2: FAILED =========="
+	exit 1
 fi
