@@ -173,11 +173,9 @@ count_down 10 "Waiting VM to shutdown"
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
 VBoxManage startvm "$VM_NAME"
 
-#TODO: make this script wait on some box property that is going to be set after the VBox Guest Additions is installed in the VM.
-
-#FIRST_SNAPSHOT_NAME="my-machine-setup"
+FIRST_SNAPSHOT_NAME="empty-machine"
 # Snapshot after the setup is done.
-#VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
+VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 # To get back to a snapshot
 #VBoxManage snapshot "$VM_NAME" restore $FIRST_SNAPSHOT_NAME
