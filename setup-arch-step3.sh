@@ -38,9 +38,20 @@ echo -e "${USER_PWD}\n${USER_PWD}" | passwd $USER
 # Using XORG because XFCE currently doesn't support Wayland.
 echo "Configuring graphics..."
 install_pkg xorg
+# Install the Display Manager.
+install_pkg lxdm
+install_pkg xfce4
+# Make default session to be XFCE.
+sess="session=/usr/bin"
+sed -i "s|# $sess|$sess|" /etc/lxdm/lxdm.conf
+sed -i "s|$sess/startlxde|$sess/startxfce4|" /etc/lxdm/lxdm.conf
 ##################################################
 
 echo "Installing VBoxAdditions..."
-install_pkg virtualboxvirtualbox-guest-utils
+install_pkg virtualbox-guest-utils
+systemctl enable vboxservice.service
+# Only enable the DM at the end so it doesn't "get in the way".
+# Also, it should only be enabled after installing a Desktop Environment.
+systemctl enable lxdm
 
 echo "========== STEP 3 SUCCESS =========="
