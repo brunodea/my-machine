@@ -45,14 +45,65 @@ install_pkg xfce4
 sess="session=/usr/bin"
 sed -i "s|# $sess|$sess|" /etc/lxdm/lxdm.conf
 sed -i "s|$sess/startlxde|$sess/startxfce4|" /etc/lxdm/lxdm.conf
-# Configure XFCE.
-install_pkg xfce4-whiskermenu-plugin
-# Install applications
-install_pkg ristretto #image viewer
-install_pkg git
 ##################################################
+#-------------------------------------------------
+# Install packages
+#-------------------------------------------------
+install_pkg xfce4-whiskermenu-plugin
+#image viewer
+install_pkg ristretto
+install_pkg wget
+install_pkg git
+install_pkg gvim # or should I try neovim?
+install_pkg openssh
+# install yaourt
+install_pkg pkg-config
+install_pkg fakeroot
+git clone https://aur.archlinux.org/package-query.git
+cd package-query
+makepkg -si --noconfirm
+pacman -U *.pkg.* --noconfirm
+cd ..
+git clone https://aur.archlinux.org/yaourt.git
+cd yaourt
+makepkg -si --noconfirm
+pacman -U *.pkg.* --noconfirm
+cd ..
+#-------------------------------------------------
+# Install applications
+#-------------------------------------------------
+# configure things as user
+su - $USER
+function yaourt_install {
+	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yaourt -S ${@:1} --noconfirm
+}
 
+#yaourt_install firefox-nightly
+
+PRJ_DIR=~/prj
+mkdir $PRJ_DIR
+cd $PRJ_DIR
+# Download all the custom configurations.
+git clone https://github.com/brunodea/general-cfgs.git
+GEN_CFG=$PRJ_DIR/general-cfgs
+# Configure XFCE
+cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
+ln -sf $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
+
+cd ~
+# Configure .bashrc
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+ln -sf $GEN_CFG/.bashrc .
+ln -sf $GEN_CFG/.vimrc .
+ln -sf $GEN_CFG/.face .
+
+
+# go back to root
+exit
+#-------------------------------------------------
 echo "Installing VBoxAdditions..."
+# VBoxAdditions should be installed only later on, just for safety.
 install_pkg virtualbox-guest-utils
 systemctl enable vboxservice.service
 # Only enable the DM at the end so it doesn't "get in the way".
@@ -67,5 +118,12 @@ systemctl enable lxdm
 # TODO: move default_wallpaper to /home/$USER/wallpapers
 # TODO: download general-cfgs and make the proper soft links
 # TODO: install alsamixer
+# TODO: .face has to have r-- permission and /home/bruno has to have r-x permissions.
+# TODO: automate ssh-key generation
+# TODO: add file to desktop with name TODO with stuff that need to be manually done (e.g. add the SSH key to github).
+
+# TODO FILE:
+# TODO: add to the TODO file "gpg --full-gen-key" and installation of all applications via yaourt
+# TODO: add keyserver-options auto-key-retrieve to gpg.conf
 
 echo "========== STEP 3 SUCCESS =========="
