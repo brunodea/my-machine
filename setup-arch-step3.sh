@@ -28,7 +28,7 @@ echo "wheel ALL=(ALL) ALL" >> sudoers
 echo "Cmnd_Alias PACMAN = /usr/bin/pacman, /usr/bin/yaourt" >> sudoers
 echo "wheel ALL=(ALL) NOPASSWD: PACMAN" >> sudoers
 visudo -c -f sudoers
-cp sudoers /etc/sudoers
+mv sudoers /etc/sudoers
 # Create user and add to the wheel group.
 useradd -m -G wheel $USER
 echo -e "${USER_PWD}\n${USER_PWD}" | passwd $USER
@@ -67,16 +67,27 @@ install_pkg gnupg
 # install yaourt
 install_pkg pkg-config
 install_pkg fakeroot
-git clone https://aur.archlinux.org/package-query.git
-cd package-query
-makepkg -si --noconfirm
-pacman -U *.pkg.* --noconfirm
-cd ..
-git clone https://aur.archlinux.org/yaourt.git
-cd yaourt
-makepkg -si --noconfirm
-pacman -U *.pkg.* --noconfirm
-cd ..
+
+function run_as_user {
+	sudo H -u $USER bash -c "cd ~ && ${@}"
+}
+
+function install_yaourt {
+	git clone https://aur.archlinux.org/package-query.git
+	cd package-query
+	makepkg -si --noconfirm
+	sudo pacman -U *.pkg.* --noconfirm
+	cd ..
+	git clone https://aur.archlinux.org/yaourt.git
+	cd yaourt
+	makepkg -si --noconfirm
+	sudo pacman -U *.pkg.* --noconfirm
+	cd ..
+	rm -rf package-query
+	rm -rf yaourt
+}
+
+run_as_user install_yaourt
 #-------------------------------------------------
 # We need VBoxAdditions because o GPG config
 # We need GPG config because I want to install stuff with yaourt
@@ -91,58 +102,59 @@ ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
 echo "Setting GPG_CONFIG property to START"
 VBoxControl guestproperty set "GPG_CONFIG_START" "True"
 # gpg config must be done as user.
-su - $USER
-cd ~
 # because gpg waits for stdin and the stdin comes from the HOST,
 # we don't need to wait for some signal that the configuration was done.
-gpg --full-gen-key
-exit
+run_as_user "gpg --full-gen-key"
 #-------------------------------------------------
 # Install applications
 #-------------------------------------------------
 # configure things as user
-su - $USER
-echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
-gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
-gpgconf --reload gpg-agent
+
 function yaourt_install {
-	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yaourt -S ${@:1} --noconfirm
+	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yaourt -S ${@} --noconfirm
 }
 
-yaourt_install firefox-nightly
-yaourt_install lxdm-themes
+function config_system {
+	echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
+	gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
+	gpgconf --reload gpg-agent
 
-PRJ_DIR=~/prj
-mkdir $PRJ_DIR
-cd $PRJ_DIR
-# Download all the custom configurations.
-git clone https://github.com/brunodea/general-cfgs.git
-GEN_CFG=$PRJ_DIR/general-cfgs
-# Configure XFCE
-cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
-cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
-sed -i "s|\$USER|$USER|g" *
+	yaourt_install firefox-nightly
+	yaourt_install lxdm-themes
+	PRJ_DIR=/home/$USER/prj
+	# Download all the custom configurations.
+	mkdir $PRJ_DIR
+	cd $PRJ_DIR
+	git clone https://github.com/brunodea/general-cfgs.git
+	GEN_CFG=$PRJ_DIR/general-cfgs
 
-cd ~
-# Configure .bashrc
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-mv git-completion.bash .git-completion.bash
-mv git-prompt.sh .git-prompt.sh
-mkdir wallpapers
-cp $GEN_CFG/default_wallpaper.jpg wallpapers/
-cp $GEN_CFG/login_wallpaper.jpg wallpapers/
-cp $GEN_CFG/.face .
-# Permissions required by LXDM
-chmod 755 wallpapers
-chmod 755 wallpapers/default_wallpaper.jpg
-chmod 755 wallpapers/login_wallpaper.jpg
-chmod 400 .face
-ln -sf $GEN_CFG/.bashrc .
-ln -sf $GEN_CFG/.vimrc .
+	# Configure XFCE
+	cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
+	cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
+	sed -i "s|\$USER|$USER|g" *
 
-# go back to root
-exit
+	# Configure .bashrc
+	# Permissions required by LXDM
+	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+	mv git-completion.bash .git-completion.bash
+	mv git-prompt.sh .git-prompt.sh
+	mkdir wallpapers
+	cp $GEN_CFG/default_wallpaper.jpg wallpapers/
+	cp $GEN_CFG/login_wallpaper.jpg wallpapers/
+	cp $GEN_CFG/.face .
+	chmod 755 wallpapers
+	chmod 755 wallpapers/default_wallpaper.jpg
+	chmod 755 wallpapers/login_wallpaper.jpg
+	chmod 400 .face
+	ln -sf $GEN_CFG/.bashrc .
+	ln -sf $GEN_CFG/.vimrc .
+}
+
+
+run_as_user config_system
+
+
 #-------------------------------------------------
 # Only enable the DM at the end so it doesn't "get in the way".
 # Also, it should only be enabled after installing a Desktop Environment.
@@ -150,7 +162,6 @@ systemctl enable lxdm
 
 # TODO: set vbox property for "reboot finish" in the HOOK provided by LXDM.
 
-# TODO: when configuring stuff, do it as $USER instead of root.
 # TODO: install alsamixer
 # TODO: automate ssh-key generation
 # TODO: add file to desktop with name TODO with stuff that need to be manually done (e.g. add the SSH key to github).
