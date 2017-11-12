@@ -23,8 +23,10 @@ install_pkg sudo
 ##################################################
 echo "Setting up user..."
 cp /etc/sudoers .
-wheel_su="%wheel ALL=(ALL) ALL"
-sed -i "s|# $wheel_su|$wheel_su|" sudoers
+# we do this so the user won't be prompted for password with pacman and, specially, yaourt.
+echo "wheel ALL=(ALL) ALL" >> sudoers
+echo "Cmnd_Alias PACMAN = /usr/bin/pacman, /usr/bin/yaourt" >> sudoers
+echo "wheel ALL=(ALL) NOPASSWD: PACMAN" >> sudoers
 visudo -c -f sudoers
 cp sudoers /etc/sudoers
 # Create user and add to the wheel group.
@@ -56,6 +58,7 @@ install_pkg wget
 install_pkg git
 install_pkg gvim # or should I try neovim?
 install_pkg openssh
+install_pkg gnupg
 # install yaourt
 install_pkg pkg-config
 install_pkg fakeroot
@@ -70,15 +73,33 @@ makepkg -si --noconfirm
 pacman -U *.pkg.* --noconfirm
 cd ..
 #-------------------------------------------------
+# We need VBoxAdditions because o GPG config
+# We need GPG config because I want to install stuff with yaourt
+install_pkg virtualbox-guest-utils
+systemctl enable vboxservice.service
+#-------------------------------------------------
+# Configure GPG
+#-------------------------------------------------
+echo "Configuring GPG..."
+# set default pinentry used by GPG to pinentry-tty.
+ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
+echo "Setting GPG_CONFIG property to START"
+VBoxControl guestproperty set "GPG_CONFIG" "START"
+echo "Waiting GPG_CONFIG property to be DONE..."
+VBoxControl guestproperty wait "GPG_CONFIG" "DONE"
+#-------------------------------------------------
 # Install applications
 #-------------------------------------------------
 # configure things as user
 su - $USER
+echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
+gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
+gpgconf --reload gpg-agent
 function yaourt_install {
 	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yaourt -S ${@:1} --noconfirm
 }
 
-#yaourt_install firefox-nightly
+yaourt_install firefox-nightly
 
 PRJ_DIR=~/prj
 mkdir $PRJ_DIR
@@ -102,10 +123,6 @@ ln -sf $GEN_CFG/.face .
 # go back to root
 exit
 #-------------------------------------------------
-echo "Installing VBoxAdditions..."
-# VBoxAdditions should be installed only later on, just for safety.
-install_pkg virtualbox-guest-utils
-systemctl enable vboxservice.service
 # Only enable the DM at the end so it doesn't "get in the way".
 # Also, it should only be enabled after installing a Desktop Environment.
 systemctl enable lxdm
