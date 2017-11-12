@@ -24,9 +24,9 @@ install_pkg sudo
 echo "Setting up user..."
 cp /etc/sudoers .
 # we do this so the user won't be prompted for password with pacman and, specially, yaourt.
-echo "wheel ALL=(ALL) ALL" >> sudoers
+echo "%wheel ALL=(ALL) ALL" >> sudoers
 echo "Cmnd_Alias PACMAN = /usr/bin/pacman, /usr/bin/yaourt" >> sudoers
-echo "wheel ALL=(ALL) NOPASSWD: PACMAN" >> sudoers
+echo "%wheel ALL=(ALL) NOPASSWD: PACMAN" >> sudoers
 visudo -c -f sudoers
 mv sudoers /etc/sudoers
 # Create user and add to the wheel group.
