@@ -43,11 +43,12 @@ install_pkg xorg
 # Install the Display Manager.
 install_pkg lxdm
 install_pkg xfce4
-# Make default session to be XFCE.
+# Configure LXDM
 sed -i '/session=/c\session=/usr/bin/startxfce4' /etc/lxdm/lxdm.conf
-# Set background to login_wallpaper.jpg
 sed -i '/bg=/c\bg=' /etc/lxdm/lxdm.conf
 sed -i "s|bg=|bg=\/home\/$USER\/wallpapers\/login_wallpaper.jpg|g" /etc/lxdm/lxdm.conf
+sed -i '/theme=/c\theme=ArchlinuxFull' /etc/lxdm/lxdm.conf
+sed -i '/bottom_pane=/c\bottom_pane=0' /etc/lxdm/lxdm.conf
 # In order for LXDM to be able to get the background and .face images the home folder
 # has to have r-x permission for 'others'
 chmod 705 /home/$USER
@@ -104,6 +105,7 @@ function yaourt_install {
 }
 
 yaourt_install firefox-nightly
+yaourt_install lxdm-themes
 
 PRJ_DIR=~/prj
 mkdir $PRJ_DIR
