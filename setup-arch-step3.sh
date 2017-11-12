@@ -89,9 +89,14 @@ echo "Configuring GPG..."
 # set default pinentry used by GPG to pinentry-tty.
 ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
 echo "Setting GPG_CONFIG property to START"
-VBoxControl guestproperty set "GPG_CONFIG" "START"
-echo "Waiting GPG_CONFIG property to be DONE..."
-VBoxControl guestproperty wait "GPG_CONFIG" "DONE"
+VBoxControl guestproperty set "GPG_CONFIG_START" "True"
+# gpg config must be done as user.
+su - $USER
+cd ~
+# because gpg waits for stdin and the stdin comes from the HOST,
+# we don't need to wait for some signal that the configuration was done.
+gpg --full-gen-key
+exit
 #-------------------------------------------------
 # Install applications
 #-------------------------------------------------

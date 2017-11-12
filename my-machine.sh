@@ -187,12 +187,11 @@ send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step3.sh $USER \"$USER_PWD\"!"
 
 # TODO: find a way to generate GPG keys automatically only from the guest.
 echo "Waiting GPG_CONFIG property to be START..."
-VBoxManage "$VM_NAME" guestproperty wait "GPG_CONFIG" "START"
+VBoxManage "$VM_NAME" guestproperty wait "GPG_CONFIG_START"
 echo "Configuring GPG..."
-send_keys_to_vm "su - $USER!"
-sleep 2
-send_keys_to_vm "cd /home/$USER && gpg --full-gen-key!"
-sleep 2
+# wait for `$gpg --full-gen-key` to start.
+# then answer GPG's questions.
+sleep 3
 # RSA
 send_keys_to_vm "!"
 sleep 1
@@ -222,10 +221,7 @@ send_keys_to_vm "$USER_PWD!"
 sleep 3
 # pinentry repeat password
 send_keys_to_vm "$USER_PWD!"
-sleep 3
-send_keys_to_vm "exit!"
-echo "Setting GPG_CONFIG to DONE"
-VBoxManage "$VM_NAME" guestproperty set "GPG_CONFIG" "DONE"
+VBoxManage "$VM_NAME" guestproperty set "GPG_CONFIG_START" "False"
 
 # TODO: create a snapshot after STEP 3 is finished.
 # how to do it: step 3 install vboxadditions, which means we can wait some property to be set. So, here we can wait such property
