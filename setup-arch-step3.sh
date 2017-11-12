@@ -69,7 +69,7 @@ install_pkg pkg-config
 install_pkg fakeroot
 
 function run_as_user {
-	sudo H -u $USER bash -c "cd ~ && ${@}"
+	sudo -H -u $USER bash -c "cd ~ && ${@}"
 }
 
 function install_yaourt {
