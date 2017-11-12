@@ -92,7 +92,7 @@ run_as_user install_yaourt
 # We need VBoxAdditions because o GPG config
 # We need GPG config because I want to install stuff with yaourt
 install_pkg virtualbox-guest-utils
-systemctl enable vboxservice.service
+systemctl enable --now vboxservice.service
 #-------------------------------------------------
 # Configure GPG
 #-------------------------------------------------
@@ -115,12 +115,17 @@ function yaourt_install {
 }
 
 function config_system {
+	echo "Started to configure system"
+	echo "Configuring GPG keys..."
 	echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
 	gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
 	gpgconf --reload gpg-agent
 
+	echo "Installing packages from yaourt..."
 	yaourt_install firefox-nightly
 	yaourt_install lxdm-themes
+
+	echo "Installing custom configurations from general-cfgs..."
 	PRJ_DIR=/home/$USER/prj
 	# Download all the custom configurations.
 	mkdir $PRJ_DIR
