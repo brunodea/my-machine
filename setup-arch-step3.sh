@@ -44,9 +44,13 @@ install_pkg xorg
 install_pkg lxdm
 install_pkg xfce4
 # Make default session to be XFCE.
-sess="session=/usr/bin"
-sed -i "s|# $sess|$sess|" /etc/lxdm/lxdm.conf
-sed -i "s|$sess/startlxde|$sess/startxfce4|" /etc/lxdm/lxdm.conf
+sed -i '/session=/c\session=/usr/bin/startxfce4' /etc/lxdm/lxdm.conf
+# Set background to login_wallpaper.jpg
+sed -i '/bg=/c\bg=' /etc/lxdm/lxdm.conf
+sed -i "s|bg=|bg=\/home\/$USER\/wallpapers\/login_wallpaper.jpg|g" /etc/lxdm/lxdm.conf
+# In order for LXDM to be able to get the background and .face images the home folder
+# has to have r-x permission for 'others'
+chmod 705 /home/$USER
 ##################################################
 #-------------------------------------------------
 # Install packages
@@ -109,16 +113,26 @@ git clone https://github.com/brunodea/general-cfgs.git
 GEN_CFG=$PRJ_DIR/general-cfgs
 # Configure XFCE
 cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
-ln -sf $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
+cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
+sed -i "s|\$USER|$USER|g" *
 
 cd ~
 # Configure .bashrc
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+mv git-completion.bash .git-completion.bash
+mv git-prompt.sh .git-prompt.sh
+mkdir wallpapers
+cp $GEN_CFG/default_wallpaper.jpg wallpapers/
+cp $GEN_CFG/login_wallpaper.jpg wallpapers/
+cp $GEN_CFG/.face .
+# Permissions required by LXDM
+chmod 755 wallpapers
+chmod 755 wallpapers/default_wallpaper.jpg
+chmod 755 wallpapers/login_wallpaper.jpg
+chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.vimrc .
-ln -sf $GEN_CFG/.face .
-
 
 # go back to root
 exit
@@ -130,17 +144,8 @@ systemctl enable lxdm
 # TODO: set vbox property for "reboot finish" in the HOOK provided by LXDM.
 
 # TODO: when configuring stuff, do it as $USER instead of root.
-# TODO: in xfce4-panel.xml replace /home to /home/$USER via sed.
-# TODO: in xfce4-desktop.xml replace /home to /home/$USER via sed.
-# TODO: move default_wallpaper to /home/$USER/wallpapers
-# TODO: download general-cfgs and make the proper soft links
 # TODO: install alsamixer
-# TODO: .face has to have r-- permission and /home/bruno has to have r-x permissions.
 # TODO: automate ssh-key generation
 # TODO: add file to desktop with name TODO with stuff that need to be manually done (e.g. add the SSH key to github).
-
-# TODO FILE:
-# TODO: add to the TODO file "gpg --full-gen-key" and installation of all applications via yaourt
-# TODO: add keyserver-options auto-key-retrieve to gpg.conf
 
 echo "========== STEP 3 SUCCESS =========="
