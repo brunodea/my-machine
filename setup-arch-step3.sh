@@ -73,21 +73,21 @@ function run_as_user {
 }
 
 function install_yaourt {
-	git clone https://aur.archlinux.org/package-query.git
-	cd package-query
-	makepkg -si --noconfirm
-	sudo pacman -U *.pkg.* --noconfirm
-	cd ..
-	git clone https://aur.archlinux.org/yaourt.git
-	cd yaourt
-	makepkg -si --noconfirm
-	sudo pacman -U *.pkg.* --noconfirm
-	cd ..
-	rm -rf package-query
-	rm -rf yaourt
+	run_as_user "git clone https://aur.archlinux.org/package-query.git && \
+		cd package-query && \
+		makepkg -si --noconfirm && \
+		sudo pacman -U *.pkg.* --noconfirm && \
+		cd .. && \
+		git clone https://aur.archlinux.org/yaourt.git && \
+		cd yaourt && \
+		makepkg -si --noconfirm && \
+		sudo pacman -U *.pkg.* --noconfirm && \
+		cd .. && \
+		rm -rf package-query && \
+		rm -rf yaourt"
 }
 
-run_as_user install_yaourt
+install_yaourt
 #-------------------------------------------------
 # We need VBoxAdditions because o GPG config
 # We need GPG config because I want to install stuff with yaourt
@@ -115,50 +115,44 @@ function yaourt_install {
 }
 
 function config_system {
-	echo "Started to configure system"
-	echo "Configuring GPG keys..."
-	echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
-	gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
-	gpgconf --reload gpg-agent
-
-	echo "Installing packages from yaourt..."
-	yaourt_install firefox-nightly
-	yaourt_install lxdm-themes
-
-	echo "Installing custom configurations from general-cfgs..."
-	PRJ_DIR=/home/$USER/prj
-	# Download all the custom configurations.
-	mkdir $PRJ_DIR
-	cd $PRJ_DIR
-	git clone https://github.com/brunodea/general-cfgs.git
-	GEN_CFG=$PRJ_DIR/general-cfgs
-
-	# Configure XFCE
-	cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
-	cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
-	sed -i "s|\$USER|$USER|g" *
-
-	# Configure .bashrc
-	# Permissions required by LXDM
-	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
-	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-	mv git-completion.bash .git-completion.bash
-	mv git-prompt.sh .git-prompt.sh
-	mkdir wallpapers
-	cp $GEN_CFG/default_wallpaper.jpg wallpapers/
-	cp $GEN_CFG/login_wallpaper.jpg wallpapers/
-	cp $GEN_CFG/.face .
-	chmod 755 wallpapers
-	chmod 755 wallpapers/default_wallpaper.jpg
-	chmod 755 wallpapers/login_wallpaper.jpg
-	chmod 400 .face
-	ln -sf $GEN_CFG/.bashrc .
-	ln -sf $GEN_CFG/.vimrc .
+	run_as_user "echo \"Started to configure system\" && \
+	echo \"Configuring GPG keys...\" && \
+	echo \"keyserver-options auto-key-retrieve\" > ~/.gnupg/gpg.conf && \ && \
+	gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}') && \ && \
+	gpgconf --reload gpg-agent && \ && \
+	echo \"Installing packages from yaourt...\" && \
+	yaourt_install firefox-nightly && \
+	yaourt_install lxdm-themes && \
+	echo \"Installing custom configurations from general-cfgs...\" && \
+	PRJ_DIR=/home/$USER/prj && \
+	# Download all the custom configurations. && \
+	mkdir $PRJ_DIR && \
+	cd $PRJ_DIR && \
+	git clone https://github.com/brunodea/general-cfgs.git && \
+	GEN_CFG=$PRJ_DIR/general-cfgs && \
+	# Configure XFCE && \
+	cd ~/.config/xfce4/xfconf/xfce-perchannel-xml && \
+	cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml . && \
+	sed -i \"s|\$USER|$USER|g\" * && \
+	# Configure .bashrc && \
+	# Permissions required by LXDM && \
+	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && \
+	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh && \
+	mv git-completion.bash .git-completion.bash && \
+	mv git-prompt.sh .git-prompt.sh && \
+	mkdir wallpapers && \
+	cp $GEN_CFG/default_wallpaper.jpg wallpapers/ && \
+	cp $GEN_CFG/login_wallpaper.jpg wallpapers/ && \
+	cp $GEN_CFG/.face . && \
+	chmod 755 wallpapers && \
+	chmod 755 wallpapers/default_wallpaper.jpg && \
+	chmod 755 wallpapers/login_wallpaper.jpg && \
+	chmod 400 .face && \
+	ln -sf $GEN_CFG/.bashrc . && \
+	ln -sf $GEN_CFG/.vimrc ."
 }
 
-
-run_as_user config_system
-
+config_system
 
 #-------------------------------------------------
 # Only enable the DM at the end so it doesn't "get in the way".
