@@ -177,7 +177,7 @@ FIRST_SNAPSHOT_NAME="crude-machine"
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 VBoxManage startvm "$VM_NAME"
-count_down 30 "Waiting for VM to start"
+count_down 60 "Waiting for VM to start"
 
 # login to VM and make it run STEP 3.
 echo "Sending keys so the VM starts STEP 3..."
@@ -189,7 +189,7 @@ send_keys_to_vm "./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step
 
 echo "Waiting STEP_4_START property to be True..."
 VBoxManage guestproperty wait "$VM_NAME" "STEP_4_START"
-count_down 30 "Waiting for VM to start"
+count_down 60 "Waiting for VM to start"
 
 # login to VM and make it run STEP 4.
 echo "Sending keys so the VM starts STEP 4..."
@@ -197,7 +197,7 @@ send_keys_to_vm "$USER!"
 sleep 5
 send_keys_to_vm "$USER_PWD!"
 sleep 5
-send_keys_to_vm "./setup-arch-step4.sh $USER 2>&1 | tee /root/step4.out!"
+send_keys_to_vm "./setup-arch-step4.sh $USER 2>&1 | tee step4.out!"
 VBoxManage guestproperty set "$VM_NAME" "STEP_4_START" "False"
 
 # TODO: find a way to generate GPG keys automatically only from the guest.

@@ -76,6 +76,11 @@ systemctl enable --now vboxservice.service
 # set default pinentry used by GPG to pinentry-tty.
 ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
 
+# since step4 should be run as USER, we move it to the user's folder
+# and change its ownership
+mv /root/setup-arch-step4.sh /home/$USER/
+chown $USER:$USER /home/$USER/setup-arch-step4.sh
+
 echo "Setting STEP_4_START to True"
 VBoxControl guestproperty set "STEP_4_START" "True"
 
