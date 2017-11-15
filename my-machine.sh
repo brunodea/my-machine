@@ -40,15 +40,7 @@ if [ -z "$ARCH_ISO_PATH" ]; then
 	exit 1
 fi
 
-VBOXADD_ISO_PATH=$2
-if [ -z "$VBOXADD_ISO_PATH" ]; then
-	echo "VirtualBox Guest Additions .iso file path not specified."
-	VBOXADD_ISO_PATH="C:\\Program Files\\Oracle\\VirtualBox\\VBoxGuestAdditions.iso"
-	echo "Using path: $VBOXADD_ISO_PATH"
-fi
-
 exit_if_file_doesnt_exist "$ARCH_ISO_PATH"
-exit_if_file_doesnt_exist "$VBOXADD_ISO_PATH"
 
 function exit_if_exists() {
 	name=$1
@@ -86,7 +78,6 @@ VBoxManage storageattach "$VM_NAME" --storagectl $SATA_CONTROLLER --port 0 --dev
 IDE_CONTROLLER="IDE_Controller"
 VBoxManage storagectl "$VM_NAME" --name $IDE_CONTROLLER --add ide
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium "$ARCH_ISO_PATH"
-#VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 1 --type dvddrive --medium "$VBOXADD_ISO_PATH"
 
 VBoxManage modifyvm "$VM_NAME" --boot1 dvd --boot2 disk
 VBoxManage modifyvm "$VM_NAME" --memory $RAM --vram $VRAM 
@@ -161,6 +152,7 @@ cd /root
 put $DIR/setup-arch-step1.sh
 put $DIR/setup-arch-step2.sh
 put $DIR/setup-arch-step3.sh
+put $DIR/setup-arch-step4.sh
 !
 # remove \r line endings in the scripts so zsh can execute them.
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr <<!
@@ -183,11 +175,19 @@ VBoxManage startvm "$VM_NAME"
 count_down 15 "Waiting for VM to start"
 
 # login to VM and make it run STEP 3.
-send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step3.sh $USER \"$USER_PWD\"!"
+send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step3.out!"
+
+echo "Waiting STEP_4_START property to be True..."
+VBoxManage guestproperty wait "$VM_NAME" "STEP_4_START"
+count_down 15 "Waiting for VM to start"
+
+# login to VM and make it run STEP 4.
+send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step4.sh $USER 2>&1 | tee /root/step4.out!"
+VBoxManage guestproperty set "$VM_NAME" "STEP_4_START" "False"
 
 # TODO: find a way to generate GPG keys automatically only from the guest.
-echo "Waiting GPG_CONFIG property to be START..."
-VBoxManage "$VM_NAME" guestproperty wait "GPG_CONFIG_START"
+echo "Waiting GPG_CONFIG_START property to be True..."
+VBoxManage guestproperty wait "$VM_NAME" "GPG_CONFIG_START"
 echo "Configuring GPG..."
 # wait for `$gpg --full-gen-key` to start.
 # then answer GPG's questions.
@@ -215,13 +215,13 @@ send_keys_to_vm "!"
 sleep 1
 # Is this okay?
 send_keys_to_vm "O!"
-sleep 3
+sleep 10
 # pinentry password
 send_keys_to_vm "$USER_PWD!"
-sleep 3
+sleep 10
 # pinentry repeat password
 send_keys_to_vm "$USER_PWD!"
-VBoxManage "$VM_NAME" guestproperty set "GPG_CONFIG_START" "False"
+VBoxManage guestproperty set "$VM_NAME" "GPG_CONFIG_START" "False"
 
 # TODO: create a snapshot after STEP 3 is finished.
 # how to do it: step 3 install vboxadditions, which means we can wait some property to be set. So, here we can wait such property
