@@ -193,9 +193,9 @@ count_down 30 "Waiting for VM to start"
 
 # login to VM and make it run STEP 4.
 echo "Sending keys so the VM starts STEP 4..."
-send_keys_to_vm "root!"
+send_keys_to_vm "$USER!"
 sleep 5
-send_keys_to_vm "$ROOT_PWD!"
+send_keys_to_vm "$USER_PWD!"
 sleep 5
 send_keys_to_vm "./setup-arch-step4.sh $USER 2>&1 | tee /root/step4.out!"
 VBoxManage guestproperty set "$VM_NAME" "STEP_4_START" "False"
@@ -238,7 +238,15 @@ sleep 10
 send_keys_to_vm "$USER_PWD!"
 VBoxManage guestproperty set "$VM_NAME" "GPG_CONFIG_START" "False"
 
-# TODO: create a snapshot after STEP 3 is finished.
-# how to do it: step 3 install vboxadditions, which means we can wait some property to be set. So, here we can wait such property
-#SECOND_SNAPSHOT_NAME="initial-machine"
-#VBoxManage snapshot "$VM_NAME" take $SECOND_SNAPSHOT_NAME
+echo "Waiting ENABLE_LXDM to become True"
+VBoxManage guestproperty wait "$VM_NAME" "ENABLE_LXDM"
+
+sleep 2
+send_keys_to_vm "$USER_PWD!"
+VBoxManage guestproperty set "$VM_NAME" "ENABLE_LXDM" "False"
+
+SECOND_SNAPSHOT_NAME="initial-machine"
+VBoxManage snapshot "$VM_NAME" take $SECOND_SNAPSHOT_NAME
+VBoxManage guestproperty set "$VM_NAME" "FINISH_SETUP" "True"
+
+echo "My-Machine configured with success!"
