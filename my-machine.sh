@@ -12,6 +12,8 @@ function verify_var_set() {
 		echo "Variable $2 was not set."
 		print_usage
 		exit 1
+	else
+		echo "$2=$1"
 	fi
 }
 
@@ -144,6 +146,9 @@ if [ ! -f id_rsa ]; then
 	ssh-keygen -f id_rsa -t rsa -N '' -b 2048
 fi
 
+# Make a beep so the user knows he has to write the password for SSH,
+# which is ROOT_ARCHISO_PWD.
+echo -en "\a"
 # ssh operations without asking to confirm the host identity key.
 root_addr="root@$VM_IP"
 ssh-copy-id -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr
@@ -172,17 +177,27 @@ FIRST_SNAPSHOT_NAME="crude-machine"
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 VBoxManage startvm "$VM_NAME"
-count_down 15 "Waiting for VM to start"
+count_down 30 "Waiting for VM to start"
 
 # login to VM and make it run STEP 3.
-send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step3.out!"
+echo "Sending keys so the VM starts STEP 3..."
+send_keys_to_vm "root!"
+sleep 5
+send_keys_to_vm "$ROOT_PWD!"
+sleep 5
+send_keys_to_vm "./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step3.out!"
 
 echo "Waiting STEP_4_START property to be True..."
 VBoxManage guestproperty wait "$VM_NAME" "STEP_4_START"
-count_down 15 "Waiting for VM to start"
+count_down 30 "Waiting for VM to start"
 
 # login to VM and make it run STEP 4.
-send_keys_to_vm "root!$ROOT_PWD!./setup-arch-step4.sh $USER 2>&1 | tee /root/step4.out!"
+echo "Sending keys so the VM starts STEP 4..."
+send_keys_to_vm "root!"
+sleep 5
+send_keys_to_vm "$ROOT_PWD!"
+sleep 5
+send_keys_to_vm "./setup-arch-step4.sh $USER 2>&1 | tee /root/step4.out!"
 VBoxManage guestproperty set "$VM_NAME" "STEP_4_START" "False"
 
 # TODO: find a way to generate GPG keys automatically only from the guest.

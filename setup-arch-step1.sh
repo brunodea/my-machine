@@ -86,8 +86,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # move the step2 script to the /root folder and run it.
 # after everything is done, remove the script file and the .bashrc file.
-cp setup-arch-step2.sh /mnt/root
-cp setup-arch-step3.sh /mnt/root
+cp setup-arch-step* /mnt/root
 
 echo "========== STEP 1: SUCCESS =========="
 echo "Running STEP 2..."
