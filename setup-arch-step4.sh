@@ -42,6 +42,9 @@ yaourt_install firefox-nightly
 yaourt_install lxdm-themes
 yaourt_install zeal
 yaourt_install hexchat
+yaourt_install xfce4-datetime-plugin
+yaourt_install rustup 
+
 echo "Installing custom configurations from general-cfgs..."
 PRJ_DIR=/home/$USER/prj
 # Download all the custom configurations.
@@ -69,7 +72,7 @@ chmod 755 wallpapers/default_wallpaper.jpg
 chmod 755 wallpapers/login_wallpaper.jpg
 chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
-ln -sf $GEN_CFG/.vim .
+ln -sf $GEN_CFG/.vimrc .
 
 sudo VBoxControl guestproperty set "ENABLE_LXDM" "True"
 # Only enable the DM at the end so it doesn't "get in the way".
