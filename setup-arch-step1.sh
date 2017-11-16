@@ -10,6 +10,7 @@ if [ -z "$ROOT_PWD" ]; then
 	echo "Aborting. Missing root password."
 	exit 1
 fi
+HOSTNAME="$2"
 
 echo "Setting system clock..."
 # ensure the system clock is accurate
@@ -91,7 +92,7 @@ cp setup-arch-step* /mnt/root
 echo "========== STEP 1: SUCCESS =========="
 echo "Running STEP 2..."
 arch-chroot /mnt /bin/bash -c "chmod +x /root/setup-arch-step2.sh"
-arch-chroot /mnt /bin/bash -c "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} 2>&1 | tee /root/step2.out"
+arch-chroot /mnt /bin/bash -c "./root/setup-arch-step2.sh ${DISK} ${ROOT_PWD} ${HOSTNAME} 2>&1 | tee /root/step2.out"
 if [ ! $? = 0 ]; then
 	echo "========== STEP 2: FAILED =========="
 	exit 1

@@ -5,8 +5,14 @@ echo "========== STEP 2 START =========="
 #if anything fails, abort!
 set -e
 
-BOOT_DISK=$1
-ROOT_PWD=$2
+BOOT_DISK="$1"
+ROOT_PWD="$2"
+HOSTNAME="$3"
+
+if [ -z "$HOSTNAME" ]; then
+	HOSTNAME="myarch"
+fi
+
 
 echo "Setting the local time and language..."
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
@@ -15,8 +21,8 @@ hwclock --systohc
 sed 's/#en_US\.UTF-8/en_US\.UTF-8/g' -i /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "myarch" > /etc/hostname
-echo "127.0.1.1	myarch.localdoman	myarch" >> /etc/hosts
+echo "$HOSTNAME" > /etc/hostname
+echo "127.0.1.1	myarch.localdoman	$HOSTNAME" >> /etc/hosts
 
 # TODO: install wireless network stuff?
 

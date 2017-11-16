@@ -4,7 +4,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 print_usage() {
 	echo ""
-	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> ./my-machine <arch_iso> <vboxadd_iso>"
+	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso>"
+	echo "Optional env vars: VM_NAME, HOSTNAME"
 }
 
 function verify_var_set() {
@@ -22,9 +23,8 @@ verify_var_set "$PYTHON" "PYTHON"
 verify_var_set "$ROOT_PWD" "ROOT_PWD"
 verify_var_set "$USER" "USER"
 verify_var_set "$USER_PWD" "USER_PWD"
+verify_var_set "$ARCH_ISO_PATH" "ARCH_ISO_PATH"
 
-# Add VBox folder with bin files to path.
-PATH="$PATH:$VBOX:$PYTHON"
 
 function exit_if_file_doesnt_exist() {
 	file=$1
@@ -35,14 +35,8 @@ function exit_if_file_doesnt_exist() {
 	fi
 }
 
-ARCH_ISO_PATH=$1
-if [ -z "$ARCH_ISO_PATH" ]; then
-	echo "Arch .iso file path not specified."
-	print_usage
-	exit 1
-fi
-
 exit_if_file_doesnt_exist "$ARCH_ISO_PATH"
+
 
 function exit_if_exists() {
 	name=$1
@@ -55,12 +49,17 @@ function exit_if_exists() {
 	fi
 }
 
-VM_NAME='MyArch-64bits'
+if [ -z "$VM_NAME" ]; then
+	VM_NAME='MyArch-64bits'
+fi
+
 DISK_NAME="${VM_NAME}.vid"
 
 exit_if_exists "$VM_NAME" 'vms'
-exit_if_exists $DISK_NAME 'hdds'
+exit_if_exists "$DISK_NAME" 'hdds'
 
+# Add VBox folder with bin files to path.
+PATH="$PATH:$VBOX:$PYTHON"
 
 DISK_SIZE=32768 # 32GB
 OS_TYPE='ArchLinux_64'
@@ -69,12 +68,12 @@ VRAM=128
 
 # Create dynamic disk
 VBoxManage createvm --name "$VM_NAME" --ostype $OS_TYPE --register
-VBoxManage createhd --filename $DISK_NAME --size $DISK_SIZE 
+VBoxManage createhd --filename "$DISK_NAME" --size $DISK_SIZE 
 
 # SATA controller with the dynamic disk attached
 SATA_CONTROLLER="SATA_Controller"
 VBoxManage storagectl "$VM_NAME" --name $SATA_CONTROLLER --add sata --controller IntelAHCI
-VBoxManage storageattach "$VM_NAME" --storagectl $SATA_CONTROLLER --port 0 --device 0 --type hdd --medium $DISK_NAME
+VBoxManage storageattach "$VM_NAME" --storagectl $SATA_CONTROLLER --port 0 --device 0 --type hdd --medium "$DISK_NAME"
 
 # IDE controller to attach the Arch ISO and VBox Additions ISO.
 IDE_CONTROLLER="IDE_Controller"
@@ -164,7 +163,7 @@ ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_
 cd /root
 sed -i -e 's/\r$//' setup-arch-step*
 chmod +x setup-arch-step*
-./setup-arch-step1.sh $ROOT_PWD $USER "$USER_PWD"
+./setup-arch-step1.sh $ROOT_PWD $USER "$USER_PWD" "$HOSTNAME"
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
 count_down 10 "Waiting VM to shutdown"
