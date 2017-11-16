@@ -40,6 +40,7 @@ gpgconf --reload gpg-agent
 echo "Installing packages from yaourt..."
 yaourt_install firefox-nightly
 yaourt_install lxdm-themes
+yaourt_install zeal
 echo "Installing custom configurations from general-cfgs..."
 PRJ_DIR=/home/$USER/prj
 # Download all the custom configurations.
