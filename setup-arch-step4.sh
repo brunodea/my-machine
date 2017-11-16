@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo "========== STEP 4 START =========="
 
 USER=$1
@@ -49,6 +51,7 @@ GEN_CFG=$PRJ_DIR/general-cfgs
 cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
 cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
 sed -i "s|\$USER|$USER|g" *
+cd ~
 # Configure .bashrc
 # Permissions required by LXDM
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
@@ -64,7 +67,7 @@ chmod 755 wallpapers/default_wallpaper.jpg
 chmod 755 wallpapers/login_wallpaper.jpg
 chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
-ln -sf $GEN_CFG/.vim
+ln -sf $GEN_CFG/.vim .
 
 sudo VBoxControl guestproperty set "ENABLE_LXDM" "True"
 # Only enable the DM at the end so it doesn't "get in the way".
@@ -73,5 +76,5 @@ sudo systemctl enable lxdm
 
 echo "========== STEP 4 SUCCESS =========="
 
-sudo VBoxControl guestproperty wait "FINISH_SETUP" "True"
+sudo VBoxControl guestproperty wait "FINISH_SETUP"
 reboot
