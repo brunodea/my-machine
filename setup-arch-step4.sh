@@ -48,9 +48,9 @@ cd $PRJ_DIR
 git clone https://github.com/brunodea/general-cfgs.git
 GEN_CFG=$PRJ_DIR/general-cfgs
 # Configure XFCE
+cp $GEN_CFG/xfce4/ ~/.config
 cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
-cp $GEN_CFG/xfce4/xfconf/xfce-perchannel-xml/*.xml .
-sed -i "s|\$USER|$USER|g" *
+sed -i "s|\$USER|$USER|g" *.xml
 cd ~
 # Configure .bashrc
 # Permissions required by LXDM
