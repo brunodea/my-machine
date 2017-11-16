@@ -49,8 +49,8 @@ mkdir $PRJ_DIR
 cd $PRJ_DIR
 git clone https://github.com/brunodea/general-cfgs.git
 GEN_CFG=$PRJ_DIR/general-cfgs
-# Configure XFCE
-cp $GEN_CFG/xfce4/ ~/.config
+cp -r $GEN_CFG/hexchat/ ~/.config
+cp -r $GEN_CFG/xfce4/ ~/.config
 cd ~/.config/xfce4/xfconf/xfce-perchannel-xml
 sed -i "s|\$USER|$USER|g" *.xml
 cd ~
