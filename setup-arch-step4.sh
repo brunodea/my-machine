@@ -74,6 +74,58 @@ chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.vimrc .
 
+
+mkdir .vim
+cd .vim
+mkdir autoload
+git clone https://github.com/tpope/vim-pathogen.git
+ln -sf /home/$USER/.vim/autoload/vim-pathogen/autoload/pathogen.vim autoload/pathogen.vim
+mkdir bundle
+cd bundle
+#indentLine
+git clone https://github.com/Yggdroot/indentLine
+#nerdtree
+git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree
+#oceanic-next
+git clone https://github.com/mhartington/oceanic-next
+#rust.vim
+git clone --depth=1 https://github.com/rust-lang/rust.vim.git ~/.vim/bundle/rust.vim
+#denite.nvim
+#TODO: install python3 for this plugin.
+#git clone https://github.com/Shougo/denite.nvim
+#vim-airline
+git clone https://github.com/vim-airline/vim-airline
+#vim-autoformat
+git clone https://github.com/Chiel92/vim-autoformat
+#vim-devicons
+git clone https://github.com/ryanoasis/vim-devicons
+#vim-exchange
+# TODO: do I really want this?
+#git clone git://github.com/tommcdo/vim-exchange.git
+#vim-fugitive
+git clone https://github.com/tpope/vim-fugitive
+#vim-numbertoggle
+git clone https://github.com/jeffkreeftmeijer/vim-numbertoggle
+#vimproc.vim
+git clone https://github.com/Shougo/vimproc.vim
+# TODO: configure YCM
+#YCM-Generator
+git clone https://github.com/rdnetto/YCM-Generator
+#YouCompleteMe
+git clone https://github.com/Valloric/YouCompleteMe
+#zeavim.vim
+# TODO: fix config as per their README.
+git clone https://github.com/KabbAmine/zeavim.vim
+
+echo "#!/bin/bash" > update_all.sh
+echo "for d in /home/$USER/.vim/bundle/*; do" >> update_all.sh
+echo "cd $d" >> update_all.sh
+echo "git pull origin master" >> update_all.sh
+echo "git submodule update --recursive --remote" >> update_all.sh
+echo "cd .." >> update_all.sh
+echo "done" >> update_all.sh
+
+cd ~
 sudo VBoxControl guestproperty set "ENABLE_LXDM" "True"
 # Only enable the DM at the end so it doesn't "get in the way".
 # Also, it should only be enabled after installing a Desktop Environment.
