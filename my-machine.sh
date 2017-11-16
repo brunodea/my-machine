@@ -1,5 +1,6 @@
 #!/bin/bash
 
+ARCH_ISO_PATH=$1
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 print_usage() {
