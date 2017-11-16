@@ -164,7 +164,7 @@ ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_
 cd /root
 sed -i -e 's/\r$//' setup-arch-step*
 chmod +x setup-arch-step*
-./setup-arch-step1.sh $ROOT_PWD $USER "$USER_PWD" "$HOSTNAME"
+./setup-arch-step1.sh $ROOT_PWD "$HOSTNAME"
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
 count_down 10 "Waiting VM to shutdown"
