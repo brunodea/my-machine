@@ -47,6 +47,10 @@ yaourt_install rustup
 yaourt_install python
 yaourt_install nerd-fonts-complete
 yaourt_install rust-racer
+# YouCompleteMe needs it:
+# after downloading YCM, go to its folder then run:
+# ./install.py --rust-completer
+yaourt_install cmake
 
 # adding this config, because .bashrc excepts to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
