@@ -46,6 +46,14 @@ yaourt_install xfce4-datetime-plugin
 yaourt_install rustup 
 yaourt_install python
 yaourt_install nerd-fonts-complete
+yaourt_install rust-racer
+
+# adding this config, because .bashrc excepts to find the rust-src
+# in order to set the RUST_SRC_PATH environment variable
+echo "Installing RUST nightly"
+rustup toolchain install nightly
+rustup default nightly
+rustup component add rust-src
 
 echo "Installing custom configurations from general-cfgs..."
 PRJ_DIR=/home/$USER/prj
