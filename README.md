@@ -30,8 +30,10 @@ USER=<user> \
 USER_PWD=<user_pwd> \
 ./my-machine.sh <path_to_arch_iso>```
 
-*Note*: my-machine isn't currently completely automated, but it only requires manual intervention at its beginning:
-	* It will be asked to type Arch's ISO root password twice: type "root".
+*Notes*:
+	* my-machine isn't currently completely automated, but it only requires manual intervention at its beginning:
+		* It will be asked to type Arch's ISO root password: type "root";
+	* choose passwords at least 8 chars long.
 
 # Structure
 
