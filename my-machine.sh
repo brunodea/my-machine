@@ -16,39 +16,23 @@ print_usage() {
 case $SIZE in
 "small")
 	DISK_SIZE=32768 # 32GB
-	OS_TYPE='ArchLinux'
 	RAM=1024 # 1GB
 	VRAM=32
-	if [ -z "$VM_NAME" ]; then
-		VM_NAME='MyArchMachine'
-	fi
 ;;
 "medium")
 	DISK_SIZE=32768 # 32GB
-	OS_TYPE='ArchLinux'
 	RAM=2048 # 2GB
 	VRAM=64
-	if [ -z "$VM_NAME" ]; then
-		VM_NAME='MyArchMachine'
-	fi
 ;;
 "large")
 	DISK_SIZE=32768 # 32GB
-	OS_TYPE='ArchLinux'
 	RAM=4096 # 4GB
 	VRAM=128
-	if [ -z "$VM_NAME" ]; then
-		VM_NAME='MyArchMachine'
-	fi
 ;;
 "extra")
 	DISK_SIZE=32768 # 32GB
-	OS_TYPE='ArchLinux_64'
 	RAM=6144 # 6GB
 	VRAM=128
-	if [ -z "$VM_NAME" ]; then
-		VM_NAME='MyArch-64bits'
-	fi
 ;;
 *)
 	echo "ERROR: <size> was not set!"
@@ -56,6 +40,12 @@ case $SIZE in
 	exit 1
 ;;
 esac
+
+OS_TYPE='ArchLinux_64'
+
+if [ -z "$VM_NAME" ]; then
+	VM_NAME='MyArchMachine'
+fi
 
 if [ -z "$HOSTNAME" ]; then
 	HOSTNAME="my-arch"
