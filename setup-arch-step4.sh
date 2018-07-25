@@ -59,7 +59,11 @@ export RUSTUP_HOME="/home/${USER}/.rust/rustup"
 export PATH="$PATH:$CARGO_HOME/bin"
 mkdir -p CARGO_HOME
 mkdir -p RUSTUP_HOME
-curl https://sh.rustup.rs -sSf
+rust_installer=rust_installer.sh
+curl https://sh.rustup.rs -sSf > $rust_installer
+chmod +x $rust_installer
+./$rust_installer -y # install with defaults
+rm $rust_installer
 rustup install nightly
 rustup default nightly
 rustup component add rust-src
