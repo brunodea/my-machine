@@ -43,21 +43,28 @@ yaourt_install lxdm-themes
 yaourt_install zeal
 yaourt_install hexchat
 yaourt_install xfce4-datetime-plugin
-yaourt_install rustup 
+yaourt_install curl
 yaourt_install python
 yaourt_install nerd-fonts-complete
-yaourt_install rust-racer
 # YouCompleteMe needs it:
 # after downloading YCM, go to its folder then run:
 # ./install.py --rust-completer
 yaourt_install cmake
 
-# adding this config, because .bashrc excepts to find the rust-src
+# adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
 echo "Installing RUST nightly"
-rustup toolchain install nightly
+export CARGO_HOME="/home/${USER}/.rust/cargo"
+export RUSTUP_HOME="/home/${USER}/.rust/rustup"
+export PATH="$PATH:$CARGO_HOME/bin"
+mkdir -p CARGO_HOME
+mkdir -p RUSTUP_HOME
+curl https://sh.rustup.rs -sSf
+rustup install nightly
 rustup default nightly
 rustup component add rust-src
+cargo +nightly install racer
+rustup completions bash > /etc/bash_completion.d/rustup.bash-completion
 
 echo "Installing custom configurations from general-cfgs..."
 PRJ_DIR=/home/$USER/prj
