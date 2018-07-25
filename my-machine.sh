@@ -56,11 +56,11 @@ fi
 
 DISK_NAME="${VM_NAME}.vid"
 
-exit_if_exists "$VM_NAME" 'vms'
-exit_if_exists "$DISK_NAME" 'hdds'
-
 # Add VBox folder with bin files to path.
 PATH="$PATH:$VBOX:$PYTHON"
+
+exit_if_exists "$VM_NAME" 'vms'
+exit_if_exists "$DISK_NAME" 'hdds'
 
 DISK_SIZE=32768 # 32GB
 OS_TYPE='ArchLinux_64'
