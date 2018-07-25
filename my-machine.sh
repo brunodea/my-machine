@@ -1,11 +1,61 @@
 #!/bin/bash
 
 ARCH_ISO_PATH=$1
+SIZE=$2
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+case $SIZE in
+"small")
+	DISK_SIZE=32768 # 32GB
+	OS_TYPE='ArchLinux'
+	RAM=1024 # 1GB
+	VRAM=32
+	if [ -z "$VM_NAME" ]; then
+		VM_NAME='MyArchMachine'
+	fi
+;;
+"medium")
+	DISK_SIZE=32768 # 32GB
+	OS_TYPE='ArchLinux'
+	RAM=2048 # 2GB
+	VRAM=64
+	if [ -z "$VM_NAME" ]; then
+		VM_NAME='MyArchMachine'
+	fi
+;;
+"large")
+	DISK_SIZE=32768 # 32GB
+	OS_TYPE='ArchLinux'
+	RAM=4096 # 4GB
+	VRAM=128
+	if [ -z "$VM_NAME" ]; then
+		VM_NAME='MyArchMachine'
+	fi
+;;
+"extra")
+	DISK_SIZE=32768 # 32GB
+	OS_TYPE='ArchLinux_64'
+	RAM=6144 # 6GB
+	VRAM=128
+	if [ -z "$VM_NAME" ]; then
+		VM_NAME='MyArch-64bits'
+	fi
+;;
+*)
+	echo "<size> was not!"
+	print_usage
+	exit 1
+;;
+esac
+
+if [ -z "$HOSTNAME" ]; then
+	HOSTNAME="my-arch"
+fi
 
 print_usage() {
 	echo ""
-	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso>"
+	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso> <size>"
+	echo "\t <size> can be 'small', 'medium', 'large' or 'extra'"
 	echo "Optional env vars: VM_NAME, HOSTNAME"
 }
 
@@ -49,10 +99,6 @@ function exit_if_exists() {
 	fi
 }
 
-if [ -z "$VM_NAME" ]; then
-	VM_NAME='MyArch-64bits'
-fi
-
 DISK_NAME="${VM_NAME}.vid"
 
 # Add VBox folder with bin files to path.
@@ -60,11 +106,6 @@ PATH="$PATH:$VBOX:$PYTHON"
 
 exit_if_exists "$VM_NAME" 'vms'
 exit_if_exists "$DISK_NAME" 'hdds'
-
-DISK_SIZE=32768 # 32GB
-OS_TYPE='ArchLinux_64'
-RAM=4096 # 4GB
-VRAM=128 
 
 # Create dynamic disk
 VBoxManage createvm --name "$VM_NAME" --ostype $OS_TYPE --register
