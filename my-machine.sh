@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ARCH_ISO_PATH=$1
 SIZE=$2
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -87,8 +89,8 @@ function exit_if_file_doesnt_exist() {
 
 exit_if_file_doesnt_exist "$ARCH_ISO_PATH"
 
-
 function exit_if_exists() {
+	set +e
 	name=$1
 	type=$2
 	res=$(VBoxManage list "$type" | grep "$name") 
@@ -165,7 +167,7 @@ echo "Sending 'ENTER' key to "$VM_NAME"."
 VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
 
 # Waiting VM to start
-count_down 50 "Waiting for VM to start."
+count_down 75 "Waiting for VM to start."
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
@@ -211,7 +213,7 @@ chmod +x setup-arch-step*
 ./setup-arch-step1.sh $ROOT_PWD "$HOSTNAME"
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
-count_down 10 "Waiting VM to shutdown"
+count_down 25 "Waiting VM to shutdown"
 # Remove ARCHISO from the VM so it boots from the HDD.
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
 
@@ -221,7 +223,7 @@ FIRST_SNAPSHOT_NAME="crude-machine"
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 VBoxManage startvm "$VM_NAME"
-count_down 60 "Waiting for VM to start"
+count_down 75 "Waiting for VM to start"
 
 # login to VM and make it run STEP 3.
 echo "Sending keys so the VM starts STEP 3..."
@@ -233,7 +235,7 @@ send_keys_to_vm "./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step
 
 echo "Waiting STEP_4_START property to be True..."
 VBoxManage guestproperty wait "$VM_NAME" "STEP_4_START"
-count_down 60 "Waiting for VM to start"
+count_down 75 "Waiting for VM to start"
 
 # login to VM and make it run STEP 4.
 echo "Sending keys so the VM starts STEP 4..."
