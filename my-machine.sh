@@ -6,6 +6,13 @@ ARCH_ISO_PATH=$1
 SIZE=$2
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+print_usage() {
+	echo ""
+	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso> <size>"
+	echo "\t <size> can be 'small', 'medium', 'large' or 'extra'"
+	echo "Optional env vars: VM_NAME, HOSTNAME"
+}
+
 case $SIZE in
 "small")
 	DISK_SIZE=32768 # 32GB
@@ -44,7 +51,7 @@ case $SIZE in
 	fi
 ;;
 *)
-	echo "<size> was not!"
+	echo "ERROR: <size> was not set!"
 	print_usage
 	exit 1
 ;;
@@ -53,13 +60,6 @@ esac
 if [ -z "$HOSTNAME" ]; then
 	HOSTNAME="my-arch"
 fi
-
-print_usage() {
-	echo ""
-	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso> <size>"
-	echo "\t <size> can be 'small', 'medium', 'large' or 'extra'"
-	echo "Optional env vars: VM_NAME, HOSTNAME"
-}
 
 function verify_var_set() {
 	if [ -z "$1" ]; then
