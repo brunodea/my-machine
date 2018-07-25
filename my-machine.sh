@@ -26,7 +26,6 @@ verify_var_set "$USER" "USER"
 verify_var_set "$USER_PWD" "USER_PWD"
 verify_var_set "$ARCH_ISO_PATH" "ARCH_ISO_PATH"
 
-
 function exit_if_file_doesnt_exist() {
 	file=$1
 	if [ ! -f "$file" ]; then
@@ -87,15 +86,19 @@ VBoxManage modifyvm "$VM_NAME" --memory $RAM --vram $VRAM
 # host-only network in order to SSH.
 VBoxManage modifyvm "$VM_NAME" --nic2 hostonly
 
-HONLY_IP="192.168.42.1"
-VM_IP="192.168.42.100"
-# verifies if hostonly interface with the provided ip already exists
-HONLY_NET=$(VBoxManage list hostonlyifs | grep $HONLY_IP -B 3 | grep Name | awk -F: '{print $2}' | xargs)
-if [ -z "${HONLY_NET}" ]; then
+# set HONLY_IP to the default gateway of the host-only interface
+HONLY_IP=$(VBoxManage list hostonlyifs | grep -i ipaddress | awk -F: '{print $2}' | xargs)
+if [ -z "${HONLY_IP}" ]; then
+	echo "Creating new host-only interface..."
 	# case the interface doesn't exist, create a new one.
 	VBoxManage hostonlyif create
-	HONLY_NET=$(VBoxManage list hostonlyifs | grep $HONLY_IP -B 3 | grep Name | awk -F: '{print $2}' | xargs)
+	HONLY_IP=$(VBoxManage list hostonlyifs | grep -i ipaddress | awk -F: '{print $2}' | xargs)
 fi
+
+# set HONLY_NET to the name of the host-only network
+HONLY_NET=$(VBoxManage list hostonlyifs | grep $HONLY_IP -B 3 | grep Name | awk -F: '{print $2}' | xargs)
+# Adjust the VM IP to the host's local ip configuration
+VM_IP=$(echo $HONLY_IP | awk -F. '{print $1"."$2"."$3}')".123"
 
 VBoxManage hostonlyif ipconfig "${HONLY_NET}" --ip "${HONLY_IP}" --netmask 255.255.255.0
 echo "Using host-only network: ${HONLY_NET}"
@@ -115,7 +118,7 @@ function count_down {
 	echo ""
 }
 
-count_down 5 "Skipping VBox start logo."
+count_down 10 "Skipping VBox start logo."
 echo "Sending 'ENTER' key to "$VM_NAME"."
 # 1c: pressing ENTER key; 9c: releasing ENTER key.
 VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
