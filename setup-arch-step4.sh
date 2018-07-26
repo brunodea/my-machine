@@ -45,7 +45,7 @@ yaourt_install hexchat
 yaourt_install xfce4-datetime-plugin
 yaourt_install curl
 yaourt_install python
-yaourt_install nerd-fonts-complete
+yaourt_install nerd-fonts-bitstream-vera-mono
 # YouCompleteMe needs it:
 # after downloading YCM, go to its folder then run:
 # ./install.py --rust-completer
