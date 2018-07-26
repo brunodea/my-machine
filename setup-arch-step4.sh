@@ -97,6 +97,7 @@ chmod 755 wallpapers/default_wallpaper.jpg
 chmod 755 wallpapers/login_wallpaper.jpg
 chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
+ln -sf $GEN_CFG/.bash_profile .
 ln -sf $GEN_CFG/.vimrc .
 
 echo "#!/bin/bash" > update_all.sh
