@@ -23,12 +23,13 @@ Run the following command:
 `./my-machine.sh <path_to_arch_iso>`
 
 If you want, you can run everything in a single command:
+
 `VBOX=<path> PYTHON=<path> ROOT_PWD=<root_pwd> USER=<user> USER_PWD=<user_pwd> ./my-machine.sh <path_to_arch_iso>`
 
 *Notes*:
-	* my-machine isn't currently completely automated, but it only requires manual intervention at its beginning:
-		* It will be asked to type Arch's ISO root password: type "root";
-	* choose passwords at least 8 chars long.
+* my-machine isn't currently completely automated, but it only requires manual intervention at its beginning:
+	* It will be asked to type Arch's ISO root password: type "root";
+* choose passwords at least 8 chars long for ROOT_PWD and USER_PWD.
 
 # Structure
 
