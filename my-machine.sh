@@ -172,8 +172,10 @@ function send_keys_to_vm() {
 	done
 }
 
+if [ ! -d ~/.ssh ]; then
+	mkdir ~/.ssh # for ssh-copy-id temp files
+fi
 
-rm -rf ~/.ssh
 echo "Making VM setup SSH..."
 github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
 SSH_SCRIPT='setup-arch-ssh.sh'
