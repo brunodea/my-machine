@@ -69,7 +69,9 @@ rustup install nightly
 rustup default nightly
 rustup component add rust-src
 cargo +nightly install racer
-rustup completions bash > /etc/bash_completion.d/rustup.bash-completion
+#FIXME: error: no such file (folder bash_completion.d doesn't exist).
+#              shouldn't run this as sudo in this step. Find another way.
+#rustup completions bash > /etc/bash_completion.d/rustup.bash-completion
 
 echo "Installing custom configurations from general-cfgs..."
 PRJ_DIR=/home/$USER/prj
