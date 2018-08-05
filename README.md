@@ -26,7 +26,7 @@ If you want, you can run everything in a single command:
 
 `VBOX=<path> PYTHON=<path> ROOT_PWD=<root_pwd> USER=<user> USER_PWD=<user_pwd> ./my-machine.sh <path_to_arch_iso> <size>`
 
-Or you can create a file such as `run.sh`:
+Or you can create a runnable `chmod +x` file such as `run.sh`:
 
 ```bash
 #!/bin/bash
@@ -37,7 +37,7 @@ export USER="<user>"
 export USER_PWD="<user_pwd>"
 export VM_NAME="<vm_name>"
 export HOSTNAME="<hostname>"
-../my-machine.sh "<path_to_arch_iso>" <size>
+./my-machine.sh "<path_to_arch_iso>" <size>
 ```
 
 `<size>` refers to the amount of memory that will be used for the VM:
@@ -49,7 +49,8 @@ export HOSTNAME="<hostname>"
 *Notes*:
 * my-machine isn't currently completely automated, but it only requires manual intervention at its beginning:
 	* It will be asked to type Arch's ISO root password: type "root";
-* choose passwords at least 8 chars long for ROOT_PWD and USER_PWD.
+* choose passwords at least 8 chars long for ROOT_PWD and USER_PWD;
+* the VM's .vdi file will be create in the directory where `my-machine.sh` was run from.
 
 # Structure
 
