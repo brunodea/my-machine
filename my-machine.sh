@@ -161,9 +161,14 @@ count_down 75 "Waiting for VM to start."
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
-	for c in $(python $DIR/echo_scancode.py "$1"); do
-		VBoxManage controlvm ""$VM_NAME"" keyboardputscancode $c
-		sleep 0.01
+	text="$1"
+	# Send 18 chars at a time, because VirtualBox can't handle many more at once
+	# via keyboardputscancode.
+	# FIXME: MINGW messes up everything if a slice of the text
+	# starts with /, it converts it to C://!
+	chars=18
+	for i in $(seq 0 $chars ${#text}); do
+		VBoxManage controlvm ""$VM_NAME"" keyboardputscancode $(python $DIR/echo_scancode.py "${text:$i:$chars}")
 	done
 }
 
