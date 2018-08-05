@@ -50,6 +50,7 @@ yaourt_install nerd-fonts-bitstream-vera-mono
 # after downloading YCM, go to its folder then run:
 # ./install.py --rust-completer
 yaourt_install cmake
+yaourt_install alsa-utils
 
 # adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
