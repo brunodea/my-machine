@@ -52,6 +52,7 @@ yaourt_install nerd-fonts-bitstream-vera-mono
 yaourt_install cmake
 yaourt_install alsa-utils
 yaourt_install tmux
+yaourt_install powerline-fonts # used for powerline-style tmux status bar
 
 # adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
