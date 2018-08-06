@@ -51,6 +51,7 @@ yaourt_install nerd-fonts-bitstream-vera-mono
 # ./install.py --rust-completer
 yaourt_install cmake
 yaourt_install alsa-utils
+yaourt_install tmux
 
 # adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
@@ -58,8 +59,8 @@ echo "Installing RUST nightly"
 export CARGO_HOME="/home/${USER}/.rust/cargo"
 export RUSTUP_HOME="/home/${USER}/.rust/rustup"
 export PATH="$PATH:$CARGO_HOME/bin"
-mkdir -p CARGO_HOME
-mkdir -p RUSTUP_HOME
+mkdir -p "$CARGO_HOME"
+mkdir -p "$RUSTUP_HOME"
 rust_installer=rust_installer.sh
 curl https://sh.rustup.rs -sSf > $rust_installer
 chmod +x $rust_installer
