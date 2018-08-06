@@ -54,6 +54,12 @@ yaourt_install alsa-utils
 yaourt_install tmux
 yaourt_install powerline-fonts # used for powerline-style tmux status bar
 
+# tmux cool conf
+cd "/home/$USER"
+git clone https://github.com/gpakosz/.tmux.git
+ln -s -f .tmux/.tmux.conf
+cp .tmux/.tmux.conf.local . # default local conf
+
 # adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
 echo "Installing RUST nightly"
@@ -104,6 +110,7 @@ chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.bash_profile .
 ln -sf $GEN_CFG/.vimrc .
+ln -sf $GEN_CFG/.tmux.conf.local .
 
 echo "#!/bin/bash" > update_all.sh
 echo "for d in /home/$USER/.vim/bundle/*; do" >> update_all.sh
