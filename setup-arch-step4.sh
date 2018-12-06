@@ -76,6 +76,7 @@ rm $rust_installer
 rustup install nightly
 rustup default nightly
 rustup component add rust-src
+rustup component add rustfmt-preview --toolchain nightly
 cargo +nightly install racer
 #FIXME: error: no such file (folder bash_completion.d doesn't exist).
 #              shouldn't run this as sudo in this step. Find another way.
