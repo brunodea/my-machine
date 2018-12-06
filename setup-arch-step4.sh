@@ -55,6 +55,11 @@ yaourt_install tmux
 yaourt_install powerline-fonts # used for powerline-style tmux status bar
 yaourt_install neovim
 
+# installing pip and adding support for it on neovim just because of
+# the Denite plugin.
+yaourt_install python-pip
+sudo pip3 install --upgrade neovim
+
 # install vim-plug
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
