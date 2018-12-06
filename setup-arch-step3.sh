@@ -61,7 +61,6 @@ install_pkg xfce4-whiskermenu-plugin
 install_pkg ristretto
 install_pkg wget
 install_pkg git
-install_pkg gvim # or should I try neovim?
 install_pkg openssh
 install_pkg gnupg
 # for installing yaourt

@@ -53,6 +53,11 @@ yaourt_install cmake
 yaourt_install alsa-utils
 yaourt_install tmux
 yaourt_install powerline-fonts # used for powerline-style tmux status bar
+yaourt_install neovim
+
+# install vim-plug
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # tmux cool conf
 cd "/home/$USER"
@@ -110,16 +115,11 @@ chmod 755 wallpapers/login_wallpaper.jpg
 chmod 400 .face
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.bash_profile .
-ln -sf $GEN_CFG/.vimrc .
+if [ ! -d ~/.config/nvim ]; then
+	mkdir -p ~/.config/nvim
+fi
+ln -sf $GEN_CFG/init.vim ~/.config/nvim/init.vim
 ln -sf $GEN_CFG/.tmux.conf.local .
-
-echo "#!/bin/bash" > update_all.sh
-echo "for d in /home/$USER/.vim/bundle/*; do" >> update_all.sh
-echo "cd $d" >> update_all.sh
-echo "git pull origin master" >> update_all.sh
-echo "git submodule update --recursive --remote" >> update_all.sh
-echo "cd .." >> update_all.sh
-echo "done" >> update_all.sh
 
 cd ~
 sudo VBoxControl guestproperty set "ENABLE_LXDM" "True"
