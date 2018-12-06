@@ -55,3 +55,7 @@ export HOSTNAME="<hostname>"
 # Structure
 
 * my-machine.sh: Entry-point for the VM creation. It is run in the host machine and manages the VM creation and setup as well as calling the configuration steps;
+
+# TODO
+
+* Replace `yaourt` (discontinued) by `yay`.
