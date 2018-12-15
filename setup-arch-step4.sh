@@ -8,23 +8,16 @@ USER=$1
 
 # This script should be run as $USER
 
-# install yaourt
-git clone https://aur.archlinux.org/package-query.git
-cd package-query
+# install yay
+git clone https://aur.archlinux.org/yay.git
+cd yay
 makepkg -si --noconfirm
 sudo pacman -U *.pkg.* --noconfirm
-cd ..
-git clone https://aur.archlinux.org/yaourt.git
-cd yaourt
-makepkg -si --noconfirm
-sudo pacman -U *.pkg.* --noconfirm
-cd ..
-rm -rf package-query
-rm -rf yaourt
+cd .. && rm -rf yay
 
-# install package from yaourt
-function yaourt_install {
-	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yaourt -S ${@} --noconfirm
+# install package using yay
+function yay_install {
+	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yay -S ${@} --noconfirm
 }
 
 echo "Started to configure system"
@@ -37,22 +30,22 @@ gpg --full-gen-key
 echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
 gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
 gpgconf --reload gpg-agent
-echo "Installing packages from yaourt..."
-yaourt_install firefox-nightly
-yaourt_install lxdm-themes
-yaourt_install zeal
-yaourt_install hexchat
-yaourt_install xfce4-datetime-plugin
-yaourt_install curl
-yaourt_install python
-yaourt_install cmake
-yaourt_install alsa-utils
-yaourt_install tmux
-yaourt_install neovim
+echo "Installing packages using yay..."
+yay_install firefox-nightly
+yay_install lxdm-themes
+yay_install zeal
+yay_install hexchat
+yay_install xfce4-datetime-plugin
+yay_install curl
+yay_install python
+yay_install cmake
+yay_install alsa-utils
+yay_install tmux
+yay_install neovim
 
 # installing pip and adding support for it on neovim just because of
 # the Denite plugin.
-yaourt_install python-pip
+yay_install python-pip
 sudo pip3 install --upgrade neovim
 
 # install vim-plug

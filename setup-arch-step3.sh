@@ -23,9 +23,9 @@ install_pkg sudo
 ##################################################
 echo "Setting up user..."
 cp /etc/sudoers .
-# we do this so the user won't be prompted for password with pacman and, specially, yaourt.
+# we do this so the user won't be prompted for password with pacman and, specially, yay.
 echo "%wheel ALL=(ALL) ALL" >> sudoers
-echo "Cmnd_Alias PACMAN = /usr/bin/pacman, /usr/bin/yaourt, /usr/bin/VBoxControl" >> sudoers
+echo "Cmnd_Alias PACMAN = /usr/bin/pacman, /usr/bin/yay, /usr/bin/VBoxControl" >> sudoers
 echo "%wheel ALL=(ALL) NOPASSWD: PACMAN" >> sudoers
 visudo -c -f sudoers
 mv sudoers /etc/sudoers
@@ -63,13 +63,13 @@ install_pkg wget
 install_pkg git
 install_pkg openssh
 install_pkg gnupg
-# for installing yaourt
+# for installing yay
 install_pkg pkg-config
 install_pkg fakeroot
 
 #-------------------------------------------------
 # We need VBoxAdditions because o GPG config
-# We need GPG config because I want to install stuff with yaourt
+# We need GPG config because I want to install stuff with yay
 install_pkg virtualbox-guest-utils
 systemctl enable --now vboxservice.service
 # set default pinentry used by GPG to pinentry-tty.
