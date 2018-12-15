@@ -45,14 +45,9 @@ yaourt_install hexchat
 yaourt_install xfce4-datetime-plugin
 yaourt_install curl
 yaourt_install python
-yaourt_install nerd-fonts-bitstream-vera-mono
-# YouCompleteMe needs it:
-# after downloading YCM, go to its folder then run:
-# ./install.py --rust-completer
 yaourt_install cmake
 yaourt_install alsa-utils
 yaourt_install tmux
-yaourt_install powerline-fonts # used for powerline-style tmux status bar
 yaourt_install neovim
 
 # installing pip and adding support for it on neovim just because of
@@ -118,13 +113,18 @@ chmod 755 wallpapers
 chmod 755 wallpapers/default_wallpaper.jpg
 chmod 755 wallpapers/login_wallpaper.jpg
 chmod 400 .face
+
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.bash_profile .
+ln -sf $GEN_CFG/init.vim ~/.config/nvim/init.vim
+ln -sf $GEN_CFG/.tmux.conf.local .
+
 if [ ! -d ~/.config/nvim ]; then
 	mkdir -p ~/.config/nvim
 fi
-ln -sf $GEN_CFG/init.vim ~/.config/nvim/init.vim
-ln -sf $GEN_CFG/.tmux.conf.local .
+
+mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf
 
 cd ~
 sudo VBoxControl guestproperty set "ENABLE_LXDM" "True"
