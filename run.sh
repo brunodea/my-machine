@@ -9,14 +9,15 @@ cd out
 function ask_input() {
     name="$1"
     default_value="$2"
+    par=""
     if [ ! -z $default_value ]; then
-        default_value=" (${default_value})"
+        par=" (${default_value})"
     fi
 
     varname=""
     while [ -z $varname ]
     do
-        echo -n "Type ${name}${default_value}: " >&2
+        echo -n "Type ${name}${par}: " >&2
         read varname
         if [ ! -z $default_value ]; then
             break
@@ -47,4 +48,4 @@ if [ ! -f $arch_iso_name ]; then
     wget "http://ftp.acc.umu.se/mirror/archlinux/iso/${arch_current_release}/${arch_iso_name}"
 fi
 
-../my-machine.sh "${arch_iso_name}" $size
+../my-machine.sh "${arch_iso_name}" "$size"
