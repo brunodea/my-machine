@@ -109,12 +109,12 @@ chmod 400 .face
 
 ln -sf $GEN_CFG/.bashrc .
 ln -sf $GEN_CFG/.bash_profile .
-ln -sf $GEN_CFG/init.vim ~/.config/nvim/init.vim
 ln -sf $GEN_CFG/.tmux.conf.local .
 
 if [ ! -d ~/.config/nvim ]; then
 	mkdir -p ~/.config/nvim
 fi
+ln -sf $GEN_CFG/init.vim ~/.config/nvim/init.vim
 
 mkdir -p ~/.local/share/fonts
 cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf
