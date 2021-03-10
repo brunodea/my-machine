@@ -94,8 +94,8 @@ sed -i "s|\$USER|$USER|g" *.xml
 cd ~
 # Configure .bashrc
 # Permissions required by LXDM
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash --output git-completion.bash
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh --output git-prompt.sh
 mv git-completion.bash .git-completion.bash
 mv git-prompt.sh .git-prompt.sh
 mkdir wallpapers

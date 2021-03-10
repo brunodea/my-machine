@@ -177,11 +177,11 @@ if [ ! -d ~/.ssh ]; then
 fi
 
 echo "Making VM setup SSH..."
-github_raw="raw.githubusercontent.com/brunodea/my-machine/master"
+github_raw="https://raw.githubusercontent.com/brunodea/my-machine/master"
 SSH_SCRIPT='setup-arch-ssh.sh'
 ROOT_ARCHISO_PWD='root'
 # '!' is interpreted as ENTER by the echo_scancode.py script.
-send_keys_to_vm "wget ${github_raw}/$SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP $ROOT_ARCHISO_PWD!"
+send_keys_to_vm "curl ${github_raw}/$SSH_SCRIPT --output $SSH_SCRIPT && chmod +x $SSH_SCRIPT && ./$SSH_SCRIPT $VM_IP $ROOT_ARCHISO_PWD!"
 
 count_down 5 "Waiting for VM to start the SSH service."
 # create keys without prompting for passphrases.

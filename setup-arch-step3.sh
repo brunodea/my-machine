@@ -59,7 +59,7 @@ chmod 705 /home/$USER
 install_pkg xfce4-whiskermenu-plugin
 #image viewer
 install_pkg ristretto
-install_pkg wget
+install_pkg curl
 install_pkg git
 install_pkg openssh
 install_pkg gnupg

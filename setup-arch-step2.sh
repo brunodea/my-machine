@@ -35,9 +35,10 @@ grub-install --target=i386-pc /dev/$BOOT_DISK
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # for intel microcode updates
-pacman -S intel-ucode --noconfirm
+pacman -S amd-ucode --noconfirm
 # install NetworkMananger
 pacman -S networkmanager --noconfirm
+
 # fix grub
 grub-mkconfig -o /boot/grub/grub.cfg
 

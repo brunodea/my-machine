@@ -82,7 +82,7 @@ mount /dev/$HOME_DISK /mnt/home
 ################################################################
 
 echo "Installing the base package..."
-yes | pacstrap /mnt base
+yes | pacstrap /mnt base base-devel linux-zen
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # move the step2 script to the /root folder and run it.
