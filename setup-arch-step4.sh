@@ -60,22 +60,22 @@ cp .tmux/.tmux.conf.local . # default local conf
 
 # adding this config, because .bashrc expects to find the rust-src
 # in order to set the RUST_SRC_PATH environment variable
-echo "Installing RUST nightly"
-export CARGO_HOME="/home/${USER}/.rust/cargo"
-export RUSTUP_HOME="/home/${USER}/.rust/rustup"
-export PATH="$PATH:$CARGO_HOME/bin"
-mkdir -p "$CARGO_HOME"
-mkdir -p "$RUSTUP_HOME"
-rust_installer=rust_installer.sh
-curl https://sh.rustup.rs -sSf > $rust_installer
-chmod +x $rust_installer
-./$rust_installer -y # install with defaults
-rm $rust_installer
-rustup install nightly
-rustup default nightly
-rustup component add rust-src
-rustup component add rustfmt-preview --toolchain nightly
-cargo +nightly install racer
+#echo "Installing RUST nightly"
+#export CARGO_HOME="/home/${USER}/.rust/cargo"
+#export RUSTUP_HOME="/home/${USER}/.rust/rustup"
+#export PATH="$PATH:$CARGO_HOME/bin"
+#mkdir -p "$CARGO_HOME"
+#mkdir -p "$RUSTUP_HOME"
+#rust_installer=rust_installer.sh
+#curl https://sh.rustup.rs -sSf > $rust_installer
+#chmod +x $rust_installer
+#./$rust_installer -y # install with defaults
+#rm $rust_installer
+#rustup install nightly
+#rustup default nightly
+#rustup component add rust-src
+#rustup component add rustfmt --toolchain nightly
+#cargo +nightly install racer
 #FIXME: error: no such file (folder bash_completion.d doesn't exist).
 #              shouldn't run this as sudo in this step. Find another way.
 #rustup completions bash > /etc/bash_completion.d/rustup.bash-completion

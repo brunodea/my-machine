@@ -15,7 +15,7 @@ fi
 
 
 echo "Setting the local time and language..."
-ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
 hwclock --systohc
 
 sed 's/#en_US\.UTF-8/en_US\.UTF-8/g' -i /etc/locale.gen
