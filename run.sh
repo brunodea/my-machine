@@ -15,7 +15,7 @@ function ask_input() {
     fi
 
     varname=""
-    while [ -z $varname ]
+    while [ -z "$varname" ]
     do
         echo -n "Type ${name}${par}: " >&2
         read varname

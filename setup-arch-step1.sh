@@ -28,11 +28,11 @@ function partedcmd() {
 echo "Making partion label MBR..."
 partedcmd mklabel msdos
 echo "Making partition for Boot..."
-partedcmd mkpart primary ext4 1MiB 100MiB
+partedcmd mkpart primary ext4 1MiB 300MiB
 partedcmd set 1 boot on
 # /
 echo "Making partition for Root..."
-partedcmd mkpart primary ext4 100MiB 65%
+partedcmd mkpart primary ext4 300MiB 65%
 # /swap
 echo "Making partigion for Swap..."
 partedcmd mkpart primary linux-swap 65% 67%
@@ -82,7 +82,7 @@ mount /dev/$HOME_DISK /mnt/home
 ################################################################
 
 echo "Installing the base package..."
-yes | pacstrap /mnt base base-devel linux-zen
+yes | pacstrap /mnt base base-devel linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # move the step2 script to the /root folder and run it.

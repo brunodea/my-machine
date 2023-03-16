@@ -22,7 +22,7 @@ sed 's/#en_US\.UTF-8/en_US\.UTF-8/g' -i /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "$HOSTNAME" > /etc/hostname
-echo "127.0.1.1	myarch.localdoman	$HOSTNAME" >> /etc/hosts
+echo "127.0.1.1	myarch.localdomain	$HOSTNAME" >> /etc/hosts
 
 # TODO: install wireless network stuff?
 

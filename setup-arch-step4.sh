@@ -17,7 +17,7 @@ cd .. && rm -rf yay
 
 # install package using yay
 function yay_install {
-	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yay -S ${@} --noconfirm
+	NOCONFIRM=1 BUILD_NOCONFIRM=1 EDITFILES=0 yay -v -S ${@} --noconfirm
 }
 
 echo "Started to configure system"
@@ -31,7 +31,7 @@ echo "keyserver-options auto-key-retrieve" > ~/.gnupg/gpg.conf
 gpg --send-keys $(gpg -k | grep $USER -B 1 | grep -v $USER | awk '{print $1}')
 gpgconf --reload gpg-agent
 echo "Installing packages using yay..."
-yay_install firefox-nightly
+yay_install firefox
 yay_install lxdm-themes
 yay_install zeal
 yay_install hexchat

@@ -154,6 +154,7 @@ function count_down {
 		echo -ne "Waiting... $secs: ${reason}\033[0K\r"
 		sleep 1
 		: $((secs--))
+
 	done
 	echo ""
 }
@@ -199,6 +200,7 @@ fi
 # Make a beep so the user knows he has to write the password for SSH,
 # which is ROOT_ARCHISO_PWD.
 echo -en "\a"
+echo "Type '$ROOT_ARCHISO_PWD', press enter and wait a few moments before the program proceeds."
 # ssh operations without asking to confirm the host identity key.
 root_addr="root@$VM_IP"
 ssh-copy-id -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i id_rsa $root_addr
