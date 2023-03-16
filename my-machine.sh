@@ -35,7 +35,7 @@ case $SIZE in
 	VRAM=128
 ;;
 "extra-large")
-	DISK_SIZE=49152 # 48GB
+	DISK_SIZE=81920 # 80GB
 	RAM=12288 # 12GB
 	VRAM=256
 ;;
@@ -153,7 +153,6 @@ function count_down {
 		echo -ne "Waiting... $secs: ${reason}\033[0K\r"
 		sleep 1
 		: $((secs--))
-
 	done
 	echo ""
 }
