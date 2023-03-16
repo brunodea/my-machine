@@ -2,3 +2,4 @@ out/
 *.swp
 *.vid
 id_rsa*
+.env

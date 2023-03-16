@@ -2,9 +2,8 @@
 
 set -e
 
-ARCH_ISO_PATH=$1
-SIZE=$2
-LONG_COUNTDOWN_WAIT=$3
+ARCH_ISO_PATH="$1"
+SIZE="$2"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 print_usage() {
@@ -41,7 +40,7 @@ case $SIZE in
 	VRAM=256
 ;;
 *)
-	echo "ERROR: <size> was not set!"
+	echo "ERROR: <size> is invalid: '${SIZE}'"
 	print_usage
 	exit 1
 ;;
