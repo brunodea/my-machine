@@ -1,6 +1,6 @@
 import sys
 
-# This script simples take an input and converts it to the equivalent SCANCODE information,
+# This script simply takes an input and converts it to the equivalent SCANCODE information,
 # that is, the press and release scancode for each character.
 # Currently it only works with simple texts, with characters listed in the SCANCODES variable.
 
@@ -58,6 +58,7 @@ SCANCODES = {
     " ": 0x39,
 
     #shift chars
+    "@": 0x02,
     "&": 0x08,
     "+": 0x0d,
     "<": 0x33,
@@ -75,7 +76,7 @@ SCANCODES = {
 FORMAT='{:02x}'
 
 def requires_shift(char):
-    return char in ["&", "+", ">", "|", "$", "\"", ":"]
+    return char in ["@", "&", "+", ">", "|", "$", "\"", ":"]
 
 def press_code(char_code):
     return FORMAT.format(char_code)
