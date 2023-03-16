@@ -286,6 +286,10 @@ send_keys_to_vm "$USER_PWD!"
 sleep 10
 # pinentry repeat password
 send_keys_to_vm "$USER_PWD!"
+sleep 3
+# (maybe asked) continue even if password doesn't comply to min 8 chars + special char + uppercase char
+send_keys_to_vm "T!"
+
 VBoxManage guestproperty set "$VM_NAME" "GPG_CONFIG_START" "False"
 
 echo "Waiting ENABLE_LXDM to become True"
