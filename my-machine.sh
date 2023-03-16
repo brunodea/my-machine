@@ -4,12 +4,13 @@ set -e
 
 ARCH_ISO_PATH=$1
 SIZE=$2
+LONG_COUNTDOWN_WAIT=$3
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 print_usage() {
 	echo ""
 	echo "USAGE: VBOX=<path_to_vbox_bin> PYTHON=<path_to_python> ROOT_PWD=<root_pwd> USER=<username> USER_PWD=<user_pwd> ./my-machine <arch_iso> <size>"
-	echo "\t <size> can be 'small', 'medium', 'large' or 'extra'"
+	echo "\t <size> can be 'small', 'medium', 'large', 'extra' or 'extra-large'"
 	echo "Optional env vars: VM_NAME, HOSTNAME"
 }
 
@@ -33,6 +34,11 @@ case $SIZE in
 	DISK_SIZE=49152 # 48GB
 	RAM=6144 # 6GB
 	VRAM=128
+;;
+"extra-large")
+	DISK_SIZE=49152 # 48GB
+	RAM=12288 # 12GB
+	VRAM=256
 ;;
 *)
 	echo "ERROR: <size> was not set!"
@@ -67,6 +73,7 @@ verify_var_set "$ROOT_PWD" "ROOT_PWD"
 verify_var_set "$USER" "USER"
 verify_var_set "$USER_PWD" "USER_PWD"
 verify_var_set "$ARCH_ISO_PATH" "ARCH_ISO_PATH"
+verify_var_set "$LONG_COUNTDOWN_WAIT" "LONG_COUNTDOWN_WAIT"
 
 function exit_if_file_doesnt_exist() {
 	file=$1
@@ -157,7 +164,7 @@ echo "Sending 'ENTER' key to "$VM_NAME"."
 VBoxManage controlvm "$VM_NAME" keyboardputscancode 1c 9c
 
 # Waiting VM to start
-count_down 75 "Waiting for VM to start."
+count_down $LONG_COUNTDOWN_WAIT "Waiting for VM to start."
 
 # Send keyboard keys to VM.
 function send_keys_to_vm() {
@@ -210,7 +217,7 @@ chmod +x setup-arch-step*
 ./setup-arch-step1.sh $ROOT_PWD "$HOSTNAME"
 !
 VBoxManage controlvm "$VM_NAME" acpipowerbutton
-count_down 25 "Waiting VM to shutdown"
+count_down $LONG_COUNTDOWN_WAIT "Waiting VM to shutdown"
 # Remove ARCHISO from the VM so it boots from the HDD.
 VBoxManage storageattach "$VM_NAME" --storagectl $IDE_CONTROLLER --port 0 --device 0 --type dvddrive --medium none
 
@@ -220,7 +227,7 @@ FIRST_SNAPSHOT_NAME="crude-machine"
 VBoxManage snapshot "$VM_NAME" take $FIRST_SNAPSHOT_NAME
 
 VBoxManage startvm "$VM_NAME"
-count_down 75 "Waiting for VM to start"
+count_down $LONG_COUNTDOWN_WAIT "Waiting for VM to start"
 
 # login to VM and make it run STEP 3.
 echo "Sending keys so the VM starts STEP 3..."
@@ -232,7 +239,7 @@ send_keys_to_vm "./setup-arch-step3.sh $USER \"$USER_PWD\" 2>&1 | tee /root/step
 
 echo "Waiting STEP_4_START property to be True..."
 VBoxManage guestproperty wait "$VM_NAME" "STEP_4_START"
-count_down 75 "Waiting for VM to start"
+count_down $LONG_COUNTDOWN_WAIT "Waiting for VM to start"
 
 # login to VM and make it run STEP 4.
 echo "Sending keys so the VM starts STEP 4..."

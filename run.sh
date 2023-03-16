@@ -48,4 +48,4 @@ if [ ! -f $arch_iso_name ]; then
     wget "http://ftp.acc.umu.se/mirror/archlinux/iso/${arch_current_release}/${arch_iso_name}"
 fi
 
-../my-machine.sh "${arch_iso_name}" "$size"
+../my-machine.sh "/c/Users/bruno/Documents/linux/archlinux-2023.03.01-x86_64.iso" "$SIZE" $LONG_COUNTDOWN_WAIT
